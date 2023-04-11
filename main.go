@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"whale/62teknologi-golang-utility/utils"
 	"whale/app/http/controllers"
-	middlewares "whale/app/http/midlewares"
+	"whale/app/http/middlewares"
 	"whale/config"
-	"whale/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,7 +17,8 @@ func main() {
 		return
 	}
 
-	utils.ConnectDatabase(config)
+	// todo : replace last variable with spread notation "..."
+	utils.ConnectDatabase(config.DBDriver, config.DBSource1, config.DBSource2)
 
 	r := gin.Default()
 

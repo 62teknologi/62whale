@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"whale/utils"
+	"whale/62teknologi-golang-utility/utils"
 
 	"github.com/gin-gonic/gin"
 )

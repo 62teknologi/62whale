@@ -3,8 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
-
-	"whale/utils"
+	"whale/62teknologi-golang-utility/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
