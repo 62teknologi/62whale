@@ -1,19 +1,18 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"whale/62teknologi-golang-utility/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
-
-	"gorm.io/gorm"
 )
 
-func FindCatalog(ctx *gin.Context) {
+func FindCatalogGroup(ctx *gin.Context) {
 	var value map[string]interface{}
 
-	if err := utils.DB.Table(utils.PluralName).Where("id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
+	if err := utils.DB.Table(utils.SingularName+"_groups").Where("id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
@@ -23,7 +22,7 @@ func FindCatalog(ctx *gin.Context) {
 		return
 	}
 
-	transformer, _ := utils.JsonFileParser("transformers/response/" + utils.PluralName + "/find.json")
+	transformer, _ := utils.JsonFileParser("transformers/response/" + utils.SingularName + "_groups/find.json")
 	customResponse := transformer["catalog"]
 
 	utils.MapValuesShifter(transformer, value)
@@ -35,10 +34,10 @@ func FindCatalog(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.SingularName+" success", transformer))
 }
 
-func FindCatalogues(ctx *gin.Context) {
+func FindCatalogGroups(ctx *gin.Context) {
 	var values []map[string]interface{}
 
-	if err := utils.DB.Table(utils.PluralName).Find(&values).Error; err != nil {
+	if err := utils.DB.Table(utils.SingularName + "_groups").Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
@@ -46,7 +45,7 @@ func FindCatalogues(ctx *gin.Context) {
 	var customResponses []map[string]any
 
 	for _, value := range values {
-		transformer, _ := utils.JsonFileParser("transformers/response/" + utils.PluralName + "/find.json")
+		transformer, _ := utils.JsonFileParser("transformers/response/" + utils.SingularName + "_groups/find.json")
 		customResponse := transformer["catalog"]
 
 		utils.MapValuesShifter(transformer, value)
@@ -59,8 +58,8 @@ func FindCatalogues(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.PluralName+" success", customResponses))
 }
 
-func CreateCatalog(ctx *gin.Context) {
-	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.PluralName + "/create.json")
+func CreateCatalogGroup(ctx *gin.Context) {
+	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.SingularName + "_groups/create.json")
 	var input map[string]any
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -76,42 +75,13 @@ func CreateCatalog(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	item, item_exist := input["items"]
-	group, groups_exist := input["groups"]
-
-	delete(transformer, "items")
-	delete(transformer, "groups")
+	fmt.Println(input)
+	fmt.Println(transformer)
 
 	name, _ := transformer["name"].(string)
 	transformer["slug"] = slug.Make(name)
 
-	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Table(utils.PluralName).Create(&transformer).Error; err != nil {
-			return err
-		}
-
-		if item_exist || groups_exist {
-			tx.Table(utils.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
-
-			if item_exist {
-				items := utils.Prepare1toM(utils.SingularName+"_id", transformer["id"], item)
-
-				if err := tx.Table(utils.SingularName + "_items").Create(&items).Error; err != nil {
-					return err
-				}
-			}
-
-			if groups_exist {
-				groups := utils.PrepareMtoM(utils.SingularName+"_id", transformer["id"], utils.SingularName+"_group_id", group)
-
-				if err := tx.Table(utils.PluralName + "_groups").Create(&groups).Error; err != nil {
-					return err
-				}
-			}
-		}
-
-		return nil
-	}); err != nil {
+	if err := utils.DB.Table(utils.SingularName + "_groups").Create(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
@@ -119,8 +89,8 @@ func CreateCatalog(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+utils.SingularName+" success", transformer))
 }
 
-func UpdateCatalog(ctx *gin.Context) {
-	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.PluralName + "/update.json")
+func UpdateCatalogGroup(ctx *gin.Context) {
+	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.SingularName + "_groups/update.json")
 	var input map[string]any
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -136,52 +106,21 @@ func UpdateCatalog(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	item, item_exist := transformer["items"]
-	group, groups_exist := transformer["groups"]
-
-	delete(transformer, "items")
-	delete(transformer, "groups")
-
 	name, _ := transformer["name"].(string)
 	transformer["slug"] = slug.Make(name)
 
-	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Table(utils.PluralName).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
-			return err
-		}
-
-		if item_exist || groups_exist {
-			if item_exist {
-				items := utils.Prepare1toM(utils.SingularName+"_id", ctx.Param("id"), item)
-
-				if err := tx.Table(utils.SingularName + "_items").Create(&items).Error; err != nil {
-					return err
-				}
-			}
-
-			if groups_exist {
-				tx.Table(utils.PluralName+"_groups").Where(utils.SingularName+"_id = ?", ctx.Param("id")).Delete(map[string]any{})
-				groups := utils.PrepareMtoM(utils.SingularName+"_id", ctx.Param("id"), utils.SingularName+"_group_id", group)
-
-				if err := tx.Table(utils.PluralName + "_groups").Create(&groups).Error; err != nil {
-					return err
-				}
-			}
-		}
-
-		return nil
-	}); err != nil {
+	if err := utils.DB.Table(utils.PluralName+"_groups").Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
 
 	// todo : make a better response!
-	FindCatalog(ctx)
+	FindCatalogGroup(ctx)
 }
 
 // todo : need to check constraint error
-func DeleteCatalog(ctx *gin.Context) {
-	if err := utils.DB.Table(utils.PluralName).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
+func DeleteCatalogGroup(ctx *gin.Context) {
+	if err := utils.DB.Table(utils.SingularName+"_groups").Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}

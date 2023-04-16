@@ -80,11 +80,11 @@ The API server will start running at `http://localhost:10081`. You can now inter
 
 | Method | Endpoint | Description |
 | - | -| - |
-| GET | /whales/v1/catalogues/:name | Retrieve a list of all whales in the catalog |
-| GET | /whales/v1/catalogues/:name/:id | Retrieve a specific whale by ID |
-| POST | /whales/v1/catalogues/:name | Add a new whale to the catalog |
-| PUT | /whales/v1/catalogues/:name/:id | Update information for a specific whale by ID |
-| DELETE | /whales/v1/catalogues/:name/:id | Delete a specific whale from the catalog by ID |
+| GET | /api/v1/catalog/:name | Retrieve a list of all whales in the catalog |
+| GET | /api/v1/catalog/:name/:id | Retrieve a specific whale by ID |
+| POST | /api/v1/catalog/:name | Add a new whale to the catalog |
+| PUT | /api/v1/catalog/:name/:id | Update information for a specific whale by ID |
+| DELETE | /api/v1/catalog/:name/:id | Delete a specific whale from the catalog by ID |
 
 For more detailed information about each endpoint, including request and response format, please refer to the [API documentation](./API_DOCUMENTATION.md).
 
