@@ -7,19 +7,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-sql-driver/mysql"
-	"github.com/gosimple/slug"
-	"gorm.io/gorm"
 )
 
-var label string
-var table string
-
 func init() {
-	label = "product"
-	table = "products"
+	label = "product category"
+	table = "product_categories"
 }
 
-func FindProduct(ctx *gin.Context) {
+func FindProductCategory(ctx *gin.Context) {
 	var value map[string]interface{}
 	err := utils.DB.Table(table).Where("id = ?", ctx.Param("id")).Take(&value).Error
 
@@ -45,7 +40,7 @@ func FindProduct(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+label+" success", transformer))
 }
 
-func FindProducts(ctx *gin.Context) {
+func FindProductCategories(ctx *gin.Context) {
 	var values []map[string]interface{}
 	err := utils.DB.Table(table).Find(&values).Error
 
@@ -69,7 +64,7 @@ func FindProducts(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+label+"s success", customResponses))
 }
 
-func UpdateProduct(ctx *gin.Context) {
+func UpdateProductCategory(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("transformers/request/" + label + "/update.json")
 	var input map[string]any
 
@@ -86,43 +81,25 @@ func UpdateProduct(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	sku, sku_exist := transformer["skus"]
-	group, groups_exist := transformer["groups"]
+	queryResult := utils.DB.Table(table).Where("id = ?", ctx.Param("id")).Updates(transformer)
 
-	delete(transformer, "skus")
-	delete(transformer, "groups")
+	if queryResult.Error != nil {
+		var mysqlErr *mysql.MySQLError
 
-	name, _ := transformer["name"].(string)
-	transformer["slug"] = slug.Make(name)
-
-	queryResult := utils.DB.Table(table).Where("id = ?", ctx.Param("id")).Updates(&transformer)
-
-	if sku_exist {
-		skus := utils.Prepare1toM("product_id", transformer["id"], sku)
-		utils.DB.Table("product_skus").Create(&skus)
-	}
-
-	if groups_exist {
-		var deleteResult = map[string]any{
-			"product_id": ctx.Param("id"),
+		if errors.As(queryResult.Error, &mysqlErr) && mysqlErr.Number == 1062 {
+			ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", queryResult.Error.Error(), nil))
+			return
 		}
-		utils.DB.Table("products_groups").Where("product_id = ?", ctx.Param("id")).Delete(&deleteResult)
-		groups := utils.PrepareMtoM("product_id", ctx.Param("id"), "product_group_id", group)
-		utils.DB.Table("products_groups").Create(&groups)
-	}
 
-	var mysqlErr *mysql.MySQLError
-
-	if queryResult.Error != nil || errors.As(queryResult.Error, &mysqlErr) && mysqlErr.Number == 1062 {
-		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", queryResult.Error.Error(), nil))
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", queryResult.Error.Error(), nil))
 		return
 	}
 
 	// todo : make a better response!
-	FindProduct(ctx)
+	FindProductCategory(ctx)
 }
 
-func CreateProduct(ctx *gin.Context) {
+func CreateProductCategory(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("transformers/request/" + label + "/create.json")
 	var input map[string]any
 
@@ -139,45 +116,24 @@ func CreateProduct(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	sku, sku_exist := input["skus"]
-	group, groups_exist := input["groups"]
+	queryResult := utils.DB.Table(table).Create(&transformer)
 
-	delete(transformer, "skus")
-	delete(transformer, "groups")
+	if queryResult.Error != nil {
+		var mysqlErr *mysql.MySQLError
 
-	name, _ := transformer["name"].(string)
-	transformer["slug"] = slug.Make(name)
-
-	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Table(table).Create(&transformer).Error; err != nil {
-			return err
+		if errors.As(queryResult.Error, &mysqlErr) && mysqlErr.Number == 1062 {
+			ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", queryResult.Error.Error(), nil))
+			return
 		}
 
-		if sku_exist || groups_exist {
-			tx.Table(table).Where("slug = ?", transformer["slug"]).Take(&transformer)
-
-			if sku_exist {
-				skus := utils.Prepare1toM("product_id", transformer["id"], sku)
-
-				if err := tx.Table("product_skus").Create(&skus).Error; err != nil {
-					return err
-				}
-			}
-
-			if groups_exist {
-				groups := utils.PrepareMtoM("product_id", transformer["id"], "product_group_id", group)
-
-				if err := tx.Table("products_groups").Create(&groups).Error; err != nil {
-					return err
-				}
-			}
-		}
-
-		return nil
-	}); err != nil {
-		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", queryResult.Error.Error(), nil))
 		return
 	}
 
+	/*
+		todo :
+		- make a better response!
+		- find hout how to return last ID without model
+	*/
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+label+" success", transformer))
 }

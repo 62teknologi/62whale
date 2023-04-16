@@ -1,3 +1,25 @@
 {
-    "name":"required|min:3"
+    "name":"required|min:3",
+    "user_id":"required|number",
+    "product_category_id":"required|number",
+    "description":"",
+    "length":"",
+    "width":"",
+    "height":"",
+    "minimum_order":"",
+    "is_need_insurance":"",
+    "is_new":"",
+    "video_url":"",
+    "status_id":"required",
+    "items":[{
+        "name":"",
+        "price":"",
+        "weight":"",
+        "stock":"",
+        "size":"",
+        "color":"",
+        "custom_1":"",
+        "status_id":""
+    }],
+    "groups":[""]
 }

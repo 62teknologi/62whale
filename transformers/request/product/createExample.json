@@ -1,0 +1,34 @@
+{
+    "name":"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}",
+    "user_id":"1",
+    "product_category_id":"1",
+    "description":"{{$randomLoremParagraph}}",
+    "length":"{{$randomInt}}",
+    "width":"{{$randomInt}}",
+    "height":"{{$randomInt}}",
+    "minimum_order":"{{$randomInt}}",
+    "is_need_insurance":"",
+    "is_new":"",
+    "status_id":"1",
+    "video_url":"",
+    "items":[{
+        "name":"{{$guid}}",
+        "price":"{{$randomInt}}",
+        "weight":"{{$randomInt}}",
+        "stock":"{{$randomInt}}",
+        "size":"{{$randomInt}}",
+        "color":"{{$randomColor}}",
+        "custom_1":"{{$randomInt}}",
+        "status_id":"1"
+    },{
+        "name":"{{$guid}}",
+        "price":"{{$randomInt}}",
+        "weight":"{{$randomInt}}",
+        "stock":"{{$randomInt}}",
+        "size":"{{$randomInt}}",
+        "color":"{{$randomColor}}",
+        "custom_1":"{{$randomInt}}",
+        "status_id":"1"
+    }],
+    "groups":[1,2,3,5]
+}

@@ -1,4 +1,14 @@
 {
-    "id":"",
-    "name":""
+    "name":"",
+    "user_id":"",
+    "product_category_id":"",
+    "description":"",
+    "length":"",
+    "width":"",
+    "height":"",
+    "minimum_order":"",
+    "is_need_insurance":"",
+    "is_new":"",
+    "video_url":"",
+    "status_id":""
 }
