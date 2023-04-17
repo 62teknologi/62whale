@@ -6,6 +6,7 @@ import (
 	"whale/62teknologi-golang-utility/utils"
 	"whale/app/http/controllers"
 	"whale/app/http/middlewares"
+	"whale/app/interfaces"
 	"whale/config"
 
 	"github.com/gin-gonic/gin"
@@ -26,25 +27,12 @@ func main() {
 
 	r := gin.Default()
 
-	apiV1 := r.Group("/api/v1").Use(middlewares.DbSelectorMiddleware())
+	apiV1 := r.Group("/api/v1").Use(middlewares.DbSelectorMiddleware(), middlewares.ParseTableMiddleware())
 	{
-		apiV1.GET("/category/:table", controllers.FindCatalogCategories).Use(middlewares.ParseTableMiddleware())
-		apiV1.POST("/category/:table", controllers.CreateCatalogCategory).Use(middlewares.ParseTableMiddleware())
-		apiV1.GET("/category/:table/:id", controllers.FindCatalogCategory).Use(middlewares.ParseTableMiddleware())
-		apiV1.PUT("/category/:table/:id", controllers.UpdateCatalogCategory).Use(middlewares.ParseTableMiddleware())
-		apiV1.DELETE("/category/:table/:id", controllers.DeleteCatalogCategory).Use(middlewares.ParseTableMiddleware())
-
-		apiV1.GET("/group/:table", controllers.FindCatalogGroups).Use(middlewares.ParseTableMiddleware())
-		apiV1.POST("/group/:table", controllers.CreateCatalogGroup).Use(middlewares.ParseTableMiddleware())
-		apiV1.GET("/group/:table/:id", controllers.FindCatalogGroup).Use(middlewares.ParseTableMiddleware())
-		apiV1.PUT("/group/:table/:id", controllers.UpdateCatalogGroup).Use(middlewares.ParseTableMiddleware())
-		apiV1.DELETE("/group/:table/:id", controllers.DeleteCatalogGroup).Use(middlewares.ParseTableMiddleware())
-
-		apiV1.GET("/catalog/:table", controllers.FindCatalogues).Use(middlewares.ParseTableMiddleware())
-		apiV1.POST("/catalog/:table", controllers.CreateCatalog).Use(middlewares.ParseTableMiddleware())
-		apiV1.GET("/catalog/:table/:id", controllers.FindCatalog).Use(middlewares.ParseTableMiddleware())
-		apiV1.PUT("/catalog/:table/:id", controllers.UpdateCatalog).Use(middlewares.ParseTableMiddleware())
-		apiV1.DELETE("/catalog/:table/:id", controllers.DeleteCatalog).Use(middlewares.ParseTableMiddleware())
+		RegisterRoute(apiV1, "comment", controllers.CommentController{})
+		RegisterRoute(apiV1, "category", controllers.CategoryController{})
+		RegisterRoute(apiV1, "group", controllers.GroupController{})
+		RegisterRoute(apiV1, "catalog", controllers.CatalogController{})
 	}
 
 	r.GET("/health", func(c *gin.Context) {
@@ -57,4 +45,12 @@ func main() {
 		fmt.Printf("cannot run server: %w", err)
 		return
 	}
+}
+
+func RegisterRoute(r gin.IRoutes, t string, c interfaces.Crud) {
+	r.GET("/"+t+"/:table/:id", c.Find)
+	r.GET("/"+t+"/:table", c.FindAll)
+	r.POST("/"+t+"/:table", c.Create)
+	r.PUT("/"+t+"/:table/:id", c.Update)
+	r.DELETE("/"+t+"/:table/:id", c.Delete)
 }

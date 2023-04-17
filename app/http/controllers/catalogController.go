@@ -10,7 +10,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func FindCatalog(ctx *gin.Context) {
+type CatalogController struct{}
+
+func (ctrl CatalogController) Find(ctx *gin.Context) {
 	var value map[string]interface{}
 
 	if err := utils.DB.Table(utils.PluralName).Where("id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
@@ -24,18 +26,12 @@ func FindCatalog(ctx *gin.Context) {
 	}
 
 	transformer, _ := utils.JsonFileParser("transformers/response/" + utils.PluralName + "/find.json")
-	customResponse := transformer["catalog"]
-
 	utils.MapValuesShifter(transformer, value)
-
-	if customResponse != nil {
-		utils.MapValuesShifter(customResponse.(map[string]any), value)
-	}
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.SingularName+" success", transformer))
 }
 
-func FindCatalogues(ctx *gin.Context) {
+func (ctrl CatalogController) FindAll(ctx *gin.Context) {
 	var values []map[string]interface{}
 
 	if err := utils.DB.Table(utils.PluralName).Find(&values).Error; err != nil {
@@ -43,23 +39,13 @@ func FindCatalogues(ctx *gin.Context) {
 		return
 	}
 
-	var customResponses []map[string]any
-
-	for _, value := range values {
-		transformer, _ := utils.JsonFileParser("transformers/response/" + utils.PluralName + "/find.json")
-		customResponse := transformer["catalog"]
-
-		utils.MapValuesShifter(transformer, value)
-		if customResponse != nil {
-			utils.MapValuesShifter(customResponse.(map[string]any), value)
-		}
-		customResponses = append(customResponses, transformer)
-	}
+	transformer, _ := utils.JsonFileParser("transformers/response/" + utils.PluralName + "/find.json")
+	customResponses := utils.MultiMapValuesShifter(values, transformer)
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.PluralName+" success", customResponses))
 }
 
-func CreateCatalog(ctx *gin.Context) {
+func (ctrl CatalogController) Create(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.PluralName + "/create.json")
 	var input map[string]any
 
@@ -119,7 +105,7 @@ func CreateCatalog(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+utils.SingularName+" success", transformer))
 }
 
-func UpdateCatalog(ctx *gin.Context) {
+func (ctrl CatalogController) Update(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.PluralName + "/update.json")
 	var input map[string]any
 
@@ -176,11 +162,11 @@ func UpdateCatalog(ctx *gin.Context) {
 	}
 
 	// todo : make a better response!
-	FindCatalog(ctx)
+	ctrl.Find(ctx)
 }
 
 // todo : need to check constraint error
-func DeleteCatalog(ctx *gin.Context) {
+func (ctrl CatalogController) Delete(ctx *gin.Context) {
 	if err := utils.DB.Table(utils.PluralName).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
