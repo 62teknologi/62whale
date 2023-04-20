@@ -24,7 +24,7 @@ func (ctrl GroupController) Find(ctx *gin.Context) {
 		return
 	}
 
-	transformer, _ := utils.JsonFileParser("transformers/response/" + utils.SingularName + "_groups/find.json")
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.SingularName + "_groups/find.json")
 	utils.MapValuesShifter(transformer, value)
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.SingularName+" success", transformer))
@@ -33,15 +33,22 @@ func (ctrl GroupController) Find(ctx *gin.Context) {
 func (ctrl GroupController) FindAll(ctx *gin.Context) {
 	var values []map[string]interface{}
 
-	if err := utils.DB.Table(utils.SingularName + "_groups").Find(&values).Error; err != nil {
+	query := utils.DB.Table(utils.SingularName + "_groups")
+
+	filterable, _ := utils.JsonFileParser("setting/filter/" + utils.SingularName + "_group/find.json")
+	filter := utils.FilterByQueries(query, filterable, ctx)
+
+	pagination := utils.SetPagination(query, ctx)
+
+	if err := query.Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
 
-	transformer, _ := utils.JsonFileParser("transformers/response/" + utils.SingularName + "_groups/find.json")
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.SingularName + "_groups/find.json")
 	customResponses := utils.MultiMapValuesShifter(values, transformer)
 
-	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.PluralName+" success", customResponses))
+	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+utils.PluralName+" success", customResponses, pagination, filter))
 }
 
 func (ctrl GroupController) Create(ctx *gin.Context) {

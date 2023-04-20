@@ -17,7 +17,7 @@ func (ctrl CommentController) FetchChild(id int32) []map[string]any {
 		return values
 	}
 
-	transformer, _ := utils.JsonFileParser("transformers/response/" + utils.SingularName + "_comments/find.json")
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.SingularName + "_comments/find.json")
 	customResponses := utils.MultiMapValuesShifter(values, transformer)
 
 	for _, value := range customResponses {
@@ -40,7 +40,7 @@ func (ctrl CommentController) Find(ctx *gin.Context) {
 		return
 	}
 
-	transformer, _ := utils.JsonFileParser("transformers/response/" + utils.SingularName + "_comments/find.json")
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.SingularName + "_comments/find.json")
 	utils.MapValuesShifter(transformer, value)
 
 	transformer["childs"] = ctrl.FetchChild(transformer["id"].(int32))
@@ -51,15 +51,28 @@ func (ctrl CommentController) Find(ctx *gin.Context) {
 func (ctrl CommentController) FindAll(ctx *gin.Context) {
 	var values []map[string]any
 
-	if err := utils.DB.Table(utils.SingularName + "_comments").Find(&values).Error; err != nil {
+	query := utils.DB.Table(utils.SingularName + "_comments")
+
+	filterable, _ := utils.JsonFileParser("setting/filter/" + utils.SingularName + "_comments/find.json")
+	filter := utils.FilterByQueries(query, filterable, ctx)
+
+	pagination := utils.SetPagination(query, ctx)
+
+	if err := query.Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
 
-	transformer, _ := utils.JsonFileParser("transformers/response/" + utils.SingularName + "_comments/find.json")
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.SingularName + "_comments/find.json")
 	customResponses := utils.MultiMapValuesShifter(values, transformer)
 
-	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.PluralName+" success", customResponses))
+	if ctx.Query("include_childs") != "" {
+		for _, value := range customResponses {
+			value["childs"] = ctrl.FetchChild(value["id"].(int32))
+		}
+	}
+
+	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+utils.PluralName+" success", customResponses, pagination, filter))
 }
 
 func (ctrl CommentController) Create(ctx *gin.Context) {
@@ -78,9 +91,6 @@ func (ctrl CommentController) Create(ctx *gin.Context) {
 
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
-
-	name, _ := transformer["name"].(string)
-	transformer["slug"] = slug.Make(name)
 
 	if err := utils.DB.Table(utils.SingularName + "_comments").Create(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
