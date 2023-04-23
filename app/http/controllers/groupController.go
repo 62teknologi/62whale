@@ -12,47 +12,48 @@ import (
 type GroupController struct{}
 
 func (ctrl GroupController) Find(ctx *gin.Context) {
-	var value map[string]interface{}
+	value := map[string]any{}
+	columns := []string{utils.SingularName + "_groups.*"}
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.SingularName + "_groups/find.json")
+	query := utils.DB.Table(utils.SingularName + "_groups")
 
-	if err := utils.DB.Table(utils.SingularName+"_groups").Where("id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
-		return
-	}
+	utils.SetJoin(query, transformer, &columns)
 
-	if value["id"] == nil {
+	if err := query.Select(columns).Where(utils.SingularName+"_groups."+"id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", utils.SingularName+" not found", nil))
 		return
 	}
 
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.SingularName + "_groups/find.json")
 	utils.MapValuesShifter(transformer, value)
+	utils.AttachJoin(transformer, value)
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.SingularName+" success", transformer))
 }
 
 func (ctrl GroupController) FindAll(ctx *gin.Context) {
-	var values []map[string]interface{}
-
+	values := []map[string]any{}
+	columns := []string{utils.SingularName + "_groups.*"}
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.SingularName + "_groups/find.json")
 	query := utils.DB.Table(utils.SingularName + "_groups")
 
-	filterable, _ := utils.JsonFileParser("setting/filter/" + utils.SingularName + "_group/find.json")
-	filter := utils.FilterByQueries(query, filterable, ctx)
+	utils.SetJoin(query, transformer, &columns)
 
+	filterable, _ := utils.JsonFileParser("setting/filter/" + utils.SingularName + "_groups/find.json")
+	filter := utils.FilterByQueries(query, filterable, ctx)
 	pagination := utils.SetPagination(query, ctx)
 
-	if err := query.Find(&values).Error; err != nil {
+	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
 
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.SingularName + "_groups/find.json")
 	customResponses := utils.MultiMapValuesShifter(values, transformer)
 
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+utils.PluralName+" success", customResponses, pagination, filter))
 }
 
 func (ctrl GroupController) Create(ctx *gin.Context) {
-	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.SingularName + "_groups/create.json")
+	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + utils.SingularName + "_groups/create.json")
 	var input map[string]any
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -83,7 +84,7 @@ func (ctrl GroupController) Create(ctx *gin.Context) {
 }
 
 func (ctrl GroupController) Update(ctx *gin.Context) {
-	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.SingularName + "_groups/update.json")
+	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + utils.SingularName + "_groups/update.json")
 	var input map[string]any
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -107,8 +108,7 @@ func (ctrl GroupController) Update(ctx *gin.Context) {
 		return
 	}
 
-	// todo : make a better response!
-	ctrl.Find(ctx)
+	ctx.JSON(http.StatusOK, utils.ResponseData("success", "update "+utils.SingularName+" success", transformer))
 }
 
 // todo : need to check constraint error

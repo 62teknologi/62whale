@@ -5,6 +5,7 @@ import (
 	"whale/62teknologi-golang-utility/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/gosimple/slug"
 
 	"gorm.io/gorm"
@@ -13,10 +14,15 @@ import (
 type CatalogController struct{}
 
 func (ctrl CatalogController) Find(ctx *gin.Context) {
-	var value map[string]interface{}
+	value := map[string]any{}
+	columns := []string{utils.PluralName + ".*"}
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.PluralName + "/find.json")
+	query := utils.DB.Table(utils.PluralName)
 
-	if err := utils.DB.Table(utils.PluralName).Where("id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+	utils.SetJoin(query, transformer, &columns)
+
+	if err := query.Select(columns).Where(utils.PluralName+".id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", utils.SingularName+" not found", nil))
 		return
 	}
 
@@ -25,35 +31,36 @@ func (ctrl CatalogController) Find(ctx *gin.Context) {
 		return
 	}
 
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.PluralName + "/find.json")
 	utils.MapValuesShifter(transformer, value)
+	utils.AttachJoin(transformer, value)
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.SingularName+" success", transformer))
 }
 
 func (ctrl CatalogController) FindAll(ctx *gin.Context) {
-	var values []map[string]interface{}
-
+	values := []map[string]any{}
+	columns := []string{utils.PluralName + ".*"}
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.PluralName + "/find.json")
 	query := utils.DB.Table(utils.PluralName)
+
+	utils.SetJoin(query, transformer, &columns)
 
 	filterable, _ := utils.JsonFileParser("setting/filter/" + utils.PluralName + "/find.json")
 	filter := utils.FilterByQueries(query, filterable, ctx)
-
 	pagination := utils.SetPagination(query, ctx)
 
-	if err := query.Find(&values).Error; err != nil {
+	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
 
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.PluralName + "/find.json")
 	customResponses := utils.MultiMapValuesShifter(values, transformer)
 
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+utils.PluralName+" success", customResponses, pagination, filter))
 }
 
 func (ctrl CatalogController) Create(ctx *gin.Context) {
-	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.PluralName + "/create.json")
+	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + utils.PluralName + "/create.json")
 	var input map[string]any
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -75,8 +82,14 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 	delete(transformer, "items")
 	delete(transformer, "groups")
 
-	name, _ := transformer["name"].(string)
-	transformer["slug"] = slug.Make(name)
+	var name string
+
+	if transformer["name"] != nil {
+		name, _ = transformer["name"].(string)
+		transformer["slug"] = slug.Make(name)
+	} else {
+		transformer["slug"] = uuid.New()
+	}
 
 	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Table(utils.PluralName).Create(&transformer).Error; err != nil {
@@ -92,6 +105,8 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 				if err := tx.Table(utils.SingularName + "_items").Create(&items).Error; err != nil {
 					return err
 				}
+
+				transformer["items"] = items
 			}
 
 			if groups_exist {
@@ -100,6 +115,8 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 				if err := tx.Table(utils.PluralName + "_groups").Create(&groups).Error; err != nil {
 					return err
 				}
+
+				transformer["groups"] = groups
 			}
 		}
 
@@ -113,7 +130,7 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 }
 
 func (ctrl CatalogController) Update(ctx *gin.Context) {
-	transformer, _ := utils.JsonFileParser("transformers/request/" + utils.PluralName + "/update.json")
+	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + utils.PluralName + "/update.json")
 	var input map[string]any
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -135,8 +152,14 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 	delete(transformer, "items")
 	delete(transformer, "groups")
 
-	name, _ := transformer["name"].(string)
-	transformer["slug"] = slug.Make(name)
+	var name string
+
+	if transformer["name"] != nil {
+		name, _ = transformer["name"].(string)
+		transformer["slug"] = slug.Make(name)
+	} else {
+		transformer["slug"] = uuid.New()
+	}
 
 	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Table(utils.PluralName).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
@@ -150,6 +173,8 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 				if err := tx.Table(utils.SingularName + "_items").Create(&items).Error; err != nil {
 					return err
 				}
+
+				transformer["items"] = items
 			}
 
 			if groups_exist {
@@ -159,6 +184,8 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 				if err := tx.Table(utils.PluralName + "_groups").Create(&groups).Error; err != nil {
 					return err
 				}
+
+				transformer["groups"] = groups
 			}
 		}
 
@@ -168,8 +195,7 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 		return
 	}
 
-	// todo : make a better response!
-	ctrl.Find(ctx)
+	ctx.JSON(http.StatusOK, utils.ResponseData("success", "update "+utils.PluralName+" success", transformer))
 }
 
 // todo : need to check constraint error

@@ -11,5 +11,17 @@
     "is_need_insurance":"",
     "is_new":"",
     "video_url":"",
-    "status_id":""
+    "status_id":"",
+    "belongs_to":{
+        "user":{
+            "table":"users",
+            "fk":"user_id",
+            "columns":["id", "name"]
+        },
+        "category":{
+            "table":"product_categories",
+            "fk":"product_category_id",
+            "columns":["id", "name", "slug"]
+        }
+    }
 }
