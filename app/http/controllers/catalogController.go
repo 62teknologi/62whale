@@ -11,56 +11,71 @@ import (
 	"gorm.io/gorm"
 )
 
-type CatalogController struct{}
+type CatalogController struct {
+	SingularName  string
+	PluralName    string
+	SingularLabel string
+	PluralLabel   string
+	Table         string
+}
 
-func (ctrl CatalogController) Find(ctx *gin.Context) {
+func (ctrl *CatalogController) Init(ctx *gin.Context) {
+	ctrl.SingularName = utils.Pluralize.Singular(ctx.Param("table"))
+	ctrl.PluralName = utils.Pluralize.Plural(ctx.Param("table"))
+	ctrl.SingularLabel = ctrl.SingularName
+	ctrl.PluralLabel = ctrl.PluralName
+	ctrl.Table = ctrl.PluralName
+}
+
+func (ctrl *CatalogController) Find(ctx *gin.Context) {
+	ctrl.Init(ctx)
+
 	value := map[string]any{}
-	columns := []string{utils.PluralName + ".*"}
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.PluralName + "/find.json")
-	query := utils.DB.Table(utils.PluralName)
+	columns := []string{ctrl.PluralName + ".*"}
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.PluralName + "/find.json")
+	query := utils.DB.Table(ctrl.PluralName)
 
 	utils.SetJoin(query, transformer, &columns)
 
-	if err := query.Select(columns).Where(utils.PluralName+".id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", utils.SingularName+" not found", nil))
-		return
-	}
-
-	if value["id"] == nil {
-		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", utils.SingularName+" not found", nil))
+	if err := query.Select(columns).Where(ctrl.PluralName+".id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.SingularLabel+" not found", nil))
 		return
 	}
 
 	utils.MapValuesShifter(transformer, value)
 	utils.AttachJoin(transformer, value)
 
-	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+utils.SingularName+" success", transformer))
+	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl CatalogController) FindAll(ctx *gin.Context) {
+func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
+	ctrl.Init(ctx)
+
 	values := []map[string]any{}
-	columns := []string{utils.PluralName + ".*"}
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + utils.PluralName + "/find.json")
-	query := utils.DB.Table(utils.PluralName)
+	columns := []string{ctrl.PluralName + ".*"}
+	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.PluralName + "/find.json")
+	query := utils.DB.Table(ctrl.PluralName)
 
 	utils.SetJoin(query, transformer, &columns)
 
-	filterable, _ := utils.JsonFileParser("setting/filter/" + utils.PluralName + "/find.json")
+	filterable, _ := utils.JsonFileParser("setting/filter/" + ctrl.PluralName + "/find.json")
 	filter := utils.FilterByQueries(query, filterable, ctx)
 	pagination := utils.SetPagination(query, ctx)
 
 	if err := query.Select(columns).Find(&values).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
 		return
 	}
 
 	customResponses := utils.MultiMapValuesShifter(values, transformer)
 
-	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+utils.PluralName+" success", customResponses, pagination, filter))
+	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter))
 }
 
-func (ctrl CatalogController) Create(ctx *gin.Context) {
-	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + utils.PluralName + "/create.json")
+func (ctrl *CatalogController) Create(ctx *gin.Context) {
+	ctrl.Init(ctx)
+
+	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.PluralName + "/create.json")
 	var input map[string]any
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -92,17 +107,17 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 	}
 
 	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Table(utils.PluralName).Create(&transformer).Error; err != nil {
+		if err := tx.Table(ctrl.PluralName).Create(&transformer).Error; err != nil {
 			return err
 		}
 
 		if item_exist || groups_exist {
-			tx.Table(utils.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
+			tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
 
 			if item_exist {
-				items := utils.Prepare1toM(utils.SingularName+"_id", transformer["id"], item)
+				items := utils.Prepare1toM(ctrl.SingularName+"_id", transformer["id"], item)
 
-				if err := tx.Table(utils.SingularName + "_items").Create(&items).Error; err != nil {
+				if err := tx.Table(ctrl.SingularName + "_items").Create(&items).Error; err != nil {
 					return err
 				}
 
@@ -110,9 +125,9 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 			}
 
 			if groups_exist {
-				groups := utils.PrepareMtoM(utils.SingularName+"_id", transformer["id"], utils.SingularName+"_group_id", group)
+				groups := utils.PrepareMtoM(ctrl.SingularName+"_id", transformer["id"], ctrl.SingularName+"_group_id", group)
 
-				if err := tx.Table(utils.PluralName + "_groups").Create(&groups).Error; err != nil {
+				if err := tx.Table(ctrl.PluralName + "_groups").Create(&groups).Error; err != nil {
 					return err
 				}
 
@@ -126,11 +141,13 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+utils.SingularName+" success", transformer))
+	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl CatalogController) Update(ctx *gin.Context) {
-	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + utils.PluralName + "/update.json")
+func (ctrl *CatalogController) Update(ctx *gin.Context) {
+	ctrl.Init(ctx)
+
+	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.PluralName + "/update.json")
 	var input map[string]any
 
 	if err := ctx.BindJSON(&input); err != nil {
@@ -162,15 +179,15 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 	}
 
 	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Table(utils.PluralName).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
+		if err := tx.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
 			return err
 		}
 
 		if item_exist || groups_exist {
 			if item_exist {
-				items := utils.Prepare1toM(utils.SingularName+"_id", ctx.Param("id"), item)
+				items := utils.Prepare1toM(ctrl.SingularName+"_id", ctx.Param("id"), item)
 
-				if err := tx.Table(utils.SingularName + "_items").Create(&items).Error; err != nil {
+				if err := tx.Table(ctrl.SingularName + "_items").Create(&items).Error; err != nil {
 					return err
 				}
 
@@ -178,10 +195,10 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 			}
 
 			if groups_exist {
-				tx.Table(utils.PluralName+"_groups").Where(utils.SingularName+"_id = ?", ctx.Param("id")).Delete(map[string]any{})
-				groups := utils.PrepareMtoM(utils.SingularName+"_id", ctx.Param("id"), utils.SingularName+"_group_id", group)
+				tx.Table(ctrl.PluralName+"_groups").Where(ctrl.SingularName+"_id = ?", ctx.Param("id")).Delete(map[string]any{})
+				groups := utils.PrepareMtoM(ctrl.SingularName+"_id", ctx.Param("id"), ctrl.SingularName+"_group_id", group)
 
-				if err := tx.Table(utils.PluralName + "_groups").Create(&groups).Error; err != nil {
+				if err := tx.Table(ctrl.PluralName + "_groups").Create(&groups).Error; err != nil {
 					return err
 				}
 
@@ -195,15 +212,15 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, utils.ResponseData("success", "update "+utils.PluralName+" success", transformer))
+	ctx.JSON(http.StatusOK, utils.ResponseData("success", "update "+ctrl.SingularLabel+" success", transformer))
 }
 
 // todo : need to check constraint error
-func (ctrl CatalogController) Delete(ctx *gin.Context) {
-	if err := utils.DB.Table(utils.PluralName).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
+func (ctrl *CatalogController) Delete(ctx *gin.Context) {
+	if err := utils.DB.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, utils.ResponseData("success", "delete "+utils.SingularName+" success", nil))
+	ctx.JSON(http.StatusOK, utils.ResponseData("success", "delete "+ctrl.SingularLabel+" success", nil))
 }

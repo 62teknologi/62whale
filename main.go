@@ -27,12 +27,12 @@ func main() {
 
 	r := gin.Default()
 
-	apiV1 := r.Group("/api/v1").Use(middlewares.DbSelectorMiddleware(), middlewares.ParseTableMiddleware())
+	apiV1 := r.Group("/api/v1").Use(middlewares.DbSelectorMiddleware())
 	{
-		RegisterRoute(apiV1, "comment", controllers.CommentController{})
-		RegisterRoute(apiV1, "category", controllers.CategoryController{})
-		RegisterRoute(apiV1, "group", controllers.GroupController{})
-		RegisterRoute(apiV1, "catalog", controllers.CatalogController{})
+		RegisterRoute(apiV1, "comment", &controllers.CommentController{})
+		RegisterRoute(apiV1, "category", &controllers.CategoryController{})
+		RegisterRoute(apiV1, "group", &controllers.GroupController{})
+		RegisterRoute(apiV1, "catalog", &controllers.CatalogController{})
 	}
 
 	r.GET("/health", func(c *gin.Context) {
