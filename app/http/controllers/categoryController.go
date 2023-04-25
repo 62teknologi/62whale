@@ -7,6 +7,7 @@ import (
 	"whale/62teknologi-golang-utility/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/gosimple/slug"
 )
 
@@ -107,8 +108,14 @@ func (ctrl *CategoryController) Create(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	name, _ := transformer["name"].(string)
-	transformer["slug"] = slug.Make(name)
+	var name string
+
+	if transformer["name"] != nil {
+		name, _ = transformer["name"].(string)
+		transformer["slug"] = slug.Make(name)
+	} else {
+		transformer["slug"] = uuid.New()
+	}
 
 	if err := utils.DB.Table(ctrl.Table).Create(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
@@ -137,8 +144,13 @@ func (ctrl *CategoryController) Update(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	name, _ := transformer["name"].(string)
-	transformer["slug"] = slug.Make(name)
+	var name string
+
+	if transformer["name"] != nil {
+		name, _ = transformer["name"].(string)
+		// not sure is it needed or not, may confusing if slug changes
+		transformer["slug"] = slug.Make(name)
+	}
 
 	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))

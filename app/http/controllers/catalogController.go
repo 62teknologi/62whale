@@ -171,9 +171,8 @@ func (ctrl *CatalogController) Update(ctx *gin.Context) {
 
 	if transformer["name"] != nil {
 		name, _ = transformer["name"].(string)
+		// not sure is it needed or not, may confusing if slug changes
 		transformer["slug"] = slug.Make(name)
-	} else {
-		transformer["slug"] = uuid.New()
 	}
 
 	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
