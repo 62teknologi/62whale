@@ -53,16 +53,14 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
+	order := "id desc"
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.PluralName + "/find.json")
-	query := utils.DB.Table(ctrl.PluralName)
-
+	query := utils.DB.Table(ctrl.Table)
+	filter := utils.SetFilterByQuery(query, transformer, ctx)
+	pagination := utils.SetPagination(query, ctx)
 	utils.SetJoin(query, transformer, &columns)
 
-	filterable, _ := utils.JsonFileParser("setting/filter/" + ctrl.PluralName + "/find.json")
-	filter := utils.FilterByQueries(query, filterable, ctx)
-	pagination := utils.SetPagination(query, ctx)
-
-	if err := query.Select(columns).Find(&values).Error; err != nil {
+	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
 		return
 	}

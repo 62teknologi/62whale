@@ -2,5 +2,14 @@
     "id":"",
     "parent_id":"",
     "slug":"",
-    "name":""
+    "name":"",
+    "filterable":{
+        "id":"int",
+        "parent_id" : "int",
+        "slug" : "string",
+        "name" : "string",
+        "description" : "string",
+        "created_at" : "timestamp",
+        "updated_at" : "timestamp"
+    }
 }

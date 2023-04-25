@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 	"whale/62teknologi-golang-utility/utils"
 
 	"github.com/gin-gonic/gin"
@@ -29,7 +30,7 @@ func (ctrl *CommentController) Find(ctx *gin.Context) {
 	value := map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
-	query := utils.DB.Table(ctrl.Table + "")
+	query := utils.DB.Table(ctrl.Table)
 
 	utils.SetJoin(query, transformer, &columns)
 
@@ -42,7 +43,8 @@ func (ctrl *CommentController) Find(ctx *gin.Context) {
 	utils.AttachJoin(transformer, value)
 
 	if transformer["id"] != nil {
-		transformer["childs"] = ctrl.FetchChild(transformer["id"].(int32))
+		total := int32(1)
+		transformer["childs"] = ctrl.FetchChild(transformer["id"].(int32), []string{}, &total)
 	}
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
@@ -53,16 +55,14 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
+	order := "id desc"
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
-	query := utils.DB.Table(ctrl.Table + "")
-
+	query := utils.DB.Table(ctrl.Table)
+	filter := utils.SetFilterByQuery(query, transformer, ctx)
+	pagination := utils.SetPagination(query, ctx)
 	utils.SetJoin(query, transformer, &columns)
 
-	filterable, _ := utils.JsonFileParser("setting/filter/" + ctrl.Table + "/find.json")
-	filter := utils.FilterByQueries(query, filterable, ctx)
-	pagination := utils.SetPagination(query, ctx)
-
-	if err := query.Select(columns).Find(&values).Error; err != nil {
+	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
 		return
 	}
@@ -70,9 +70,10 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 	customResponses := utils.MultiMapValuesShifter(values, transformer)
 
 	if ctx.Query("include_childs") != "" {
+		total := int32(1)
 		for _, value := range customResponses {
 			if value["id"] != nil {
-				value["childs"] = ctrl.FetchChild(value["id"].(int32))
+				value["childs"] = ctrl.FetchChild(value["id"].(int32), []string{}, &total)
 			}
 		}
 	}
@@ -99,7 +100,7 @@ func (ctrl *CommentController) Create(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	if err := utils.DB.Table(ctrl.Table + "").Create(&transformer).Error; err != nil {
+	if err := utils.DB.Table(ctrl.Table).Create(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
@@ -146,10 +147,14 @@ func (ctrl *CommentController) Delete(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "delete "+ctrl.SingularLabel+" success", nil))
 }
 
-func (ctrl *CommentController) FetchChild(id int32) []map[string]any {
+// todo : this will generate N queries of N row. need cached mechanism to prevent that.
+func (ctrl *CommentController) FetchChild(id int32, sequence []string, total *int32) []map[string]any {
+	*total = *total + 1
 	var values []map[string]any
 
-	if err := utils.DB.Table(ctrl.Table).Where("parent_id = ?", id).Find(&values).Error; err != nil {
+	sequence = append(sequence, strconv.Itoa(int(int32(id))))
+
+	if err := utils.DB.Table(ctrl.Table).Where("parent_id = ?", id).Where("id NOT IN ?", sequence).Find(&values).Error; err != nil {
 		return values
 	}
 
@@ -157,7 +162,8 @@ func (ctrl *CommentController) FetchChild(id int32) []map[string]any {
 	customResponses := utils.MultiMapValuesShifter(values, transformer)
 
 	for _, value := range customResponses {
-		value["childs"] = ctrl.FetchChild(value["id"].(int32))
+		value["childs"] = ctrl.FetchChild(value["id"].(int32), sequence, total)
+		delete(value, "filterable")
 	}
 
 	return customResponses

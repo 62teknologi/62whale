@@ -30,12 +30,13 @@ func (ctrl *GroupController) Find(ctx *gin.Context) {
 
 	value := map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
+	order := "id desc"
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table + "")
 
 	utils.SetJoin(query, transformer, &columns)
 
-	if err := query.Select(columns).Where(ctrl.Table+"."+"id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
+	if err := query.Select(columns).Order(order).Where(ctrl.Table+"."+"id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.SingularLabel+" not found", nil))
 		return
 	}
@@ -53,12 +54,9 @@ func (ctrl *GroupController) FindAll(ctx *gin.Context) {
 	columns := []string{ctrl.Table + ".*"}
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table + "")
-
-	utils.SetJoin(query, transformer, &columns)
-
-	filterable, _ := utils.JsonFileParser("setting/filter/" + ctrl.Table + "/find.json")
-	filter := utils.FilterByQueries(query, filterable, ctx)
+	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	pagination := utils.SetPagination(query, ctx)
+	utils.SetJoin(query, transformer, &columns)
 
 	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))

@@ -9,5 +9,10 @@
             "fk":"user_id",
             "columns":["id", "name"]
         }
+    },
+    "filterable":{
+        "id":"int",
+        "parent_id" : "int",
+        "description" : "string"
     }
 }

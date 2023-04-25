@@ -23,5 +23,16 @@
             "fk":"product_category_id",
             "columns":["id", "name", "slug"]
         }
+    },
+    "filterable":{
+        "id":"int",
+        "user_id" : "int",
+        "status_id" : "int",    
+        "product_category_id " : "int",
+        "slug" : "string",
+        "name" : "string",
+        "description" : "string",
+        "created_at" : "timestamp",
+        "updated_at" : "timestamp"
     }
 }
