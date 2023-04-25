@@ -31,8 +31,9 @@ func main() {
 	{
 		RegisterRoute(apiV1, "comment", &controllers.CommentController{})
 		RegisterRoute(apiV1, "category", &controllers.CategoryController{})
-		RegisterRoute(apiV1, "group", &controllers.GroupController{})
 		RegisterRoute(apiV1, "catalog", &controllers.CatalogController{})
+		RegisterRoute(apiV1, "group", &controllers.GroupController{})
+		RegisterRoute(apiV1, "item", &controllers.ItemController{})
 	}
 
 	r.GET("/health", func(c *gin.Context) {

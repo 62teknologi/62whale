@@ -35,7 +35,7 @@ func (ctrl *CatalogController) Find(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.PluralName + "/find.json")
 	query := utils.DB.Table(ctrl.PluralName)
 
-	utils.SetJoin(query, transformer, &columns)
+	utils.SetBelongsTo(query, transformer, &columns)
 
 	if err := query.Select(columns).Where(ctrl.PluralName+".id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.SingularLabel+" not found", nil))
@@ -43,7 +43,8 @@ func (ctrl *CatalogController) Find(ctx *gin.Context) {
 	}
 
 	utils.MapValuesShifter(transformer, value)
-	utils.AttachJoin(transformer, value)
+	utils.AttachBelongsTo(transformer, value)
+	utils.AttachHasMany(transformer)
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
@@ -58,14 +59,15 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	pagination := utils.SetPagination(query, ctx)
-	utils.SetJoin(query, transformer, &columns)
+	utils.SetBelongsTo(query, transformer, &columns)
 
 	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
 		return
 	}
 
-	customResponses := utils.MultiMapValuesShifter(values, transformer)
+	customResponses := utils.MultiMapValuesShifter(transformer, values)
+	utils.MultiAttachHasMany(customResponses)
 
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter))
 }

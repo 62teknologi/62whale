@@ -12,6 +12,13 @@
     "is_new":"",
     "video_url":"",
     "status_id":"",
+    "has_many":{
+        "items":{
+            "table":"product_items",
+            "fk":"product_id",
+            "columns":["id", "name"]
+        }
+    },
     "belongs_to":{
         "user":{
             "table":"users",

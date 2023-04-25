@@ -32,7 +32,7 @@ func (ctrl *CommentController) Find(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 
-	utils.SetJoin(query, transformer, &columns)
+	utils.SetBelongsTo(query, transformer, &columns)
 
 	if err := query.Select(columns).Where(ctrl.Table+".id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.SingularLabel+" not found", nil))
@@ -40,7 +40,7 @@ func (ctrl *CommentController) Find(ctx *gin.Context) {
 	}
 
 	utils.MapValuesShifter(transformer, value)
-	utils.AttachJoin(transformer, value)
+	utils.AttachBelongsTo(transformer, value)
 
 	if transformer["id"] != nil {
 		total := int32(1)
@@ -60,14 +60,14 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	pagination := utils.SetPagination(query, ctx)
-	utils.SetJoin(query, transformer, &columns)
+	utils.SetBelongsTo(query, transformer, &columns)
 
 	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
 		return
 	}
 
-	customResponses := utils.MultiMapValuesShifter(values, transformer)
+	customResponses := utils.MultiMapValuesShifter(transformer, values)
 
 	if ctx.Query("include_childs") != "" {
 		total := int32(1)
@@ -159,7 +159,7 @@ func (ctrl *CommentController) FetchChild(id int32, sequence []string, total *in
 	}
 
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
-	customResponses := utils.MultiMapValuesShifter(values, transformer)
+	customResponses := utils.MultiMapValuesShifter(transformer, values)
 
 	for _, value := range customResponses {
 		value["childs"] = ctrl.FetchChild(value["id"].(int32), sequence, total)

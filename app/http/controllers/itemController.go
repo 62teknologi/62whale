@@ -9,7 +9,7 @@ import (
 	"github.com/gosimple/slug"
 )
 
-type GroupController struct {
+type ItemController struct {
 	SingularName  string
 	PluralName    string
 	SingularLabel string
@@ -17,15 +17,15 @@ type GroupController struct {
 	Table         string
 }
 
-func (ctrl *GroupController) Init(ctx *gin.Context) {
+func (ctrl *ItemController) Init(ctx *gin.Context) {
 	ctrl.SingularName = utils.Pluralize.Singular(ctx.Param("table"))
 	ctrl.PluralName = utils.Pluralize.Plural(ctx.Param("table"))
-	ctrl.SingularLabel = ctrl.SingularName + " group"
-	ctrl.PluralLabel = ctrl.SingularName + " groups"
-	ctrl.Table = ctrl.SingularName + "_groups"
+	ctrl.SingularLabel = ctrl.SingularName + " item"
+	ctrl.PluralLabel = ctrl.SingularName + " items"
+	ctrl.Table = ctrl.SingularName + "_items"
 }
 
-func (ctrl *GroupController) Find(ctx *gin.Context) {
+func (ctrl *ItemController) Find(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	value := map[string]any{}
@@ -47,7 +47,7 @@ func (ctrl *GroupController) Find(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *GroupController) FindAll(ctx *gin.Context) {
+func (ctrl *ItemController) FindAll(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	values := []map[string]any{}
@@ -68,7 +68,7 @@ func (ctrl *GroupController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter))
 }
 
-func (ctrl *GroupController) Create(ctx *gin.Context) {
+func (ctrl *ItemController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.Table + "/create.json")
@@ -104,7 +104,7 @@ func (ctrl *GroupController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *GroupController) Update(ctx *gin.Context) {
+func (ctrl *ItemController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.Table + "/update.json")
@@ -140,7 +140,7 @@ func (ctrl *GroupController) Update(ctx *gin.Context) {
 }
 
 // todo : need to check constraint error
-func (ctrl *GroupController) Delete(ctx *gin.Context) {
+func (ctrl *ItemController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	if err := utils.DB.Table(ctrl.Table+"").Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
