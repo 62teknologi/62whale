@@ -1,3 +1,4 @@
 {
-    "name":"required|min:3"
+    "name":"required|min:3",
+    "image_url":""
 }

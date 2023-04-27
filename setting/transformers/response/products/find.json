@@ -1,8 +1,6 @@
 {
     "id":"",
     "name":"",
-    "user_id":"",
-    "product_category_id":"",
     "description":"",
     "length":"",
     "width":"",
@@ -12,6 +10,11 @@
     "is_new":"",
     "video_url":"",
     "status_id":"",
+    "image_1_url":"",
+    "image_2_url":"",
+    "image_3_url":"",
+    "image_4_url":"",
+    "image_5_url":"",
     "has_many":{
         "items":{
             "table":"product_items",
@@ -28,6 +31,11 @@
         "category":{
             "table":"product_categories",
             "fk":"product_category_id",
+            "columns":["id", "name", "slug"]
+        },
+        "brand":{
+            "table":"brands",
+            "fk":"brand_id",
             "columns":["id", "name", "slug"]
         }
     },

@@ -35,10 +35,8 @@ func (ctrl *CategoryController) Find(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 
-	fmt.Println("table")
-	fmt.Println(ctrl.Table)
-
 	utils.SetBelongsTo(query, transformer, &columns)
+	delete(transformer, "filterable")
 
 	if err := query.Select(columns).Where(ctrl.Table+".id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.SingularName+" not found", nil))
