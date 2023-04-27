@@ -2,10 +2,20 @@
     "id":"",
     "name":"",
     "price":"",
-    "name":"",
     "weight":"",
     "stock":"",
     "size":"",
     "color":"",
-    "custom_1":""
+    "custom_1":"",
+    "status_id":"",
+    "updated_at":"",
+    "filterable":{
+        "id":"int",
+        "name" : "string",
+        "price" : "int",
+        "weight" : "int",
+        "size" : "string",
+        "color" : "string",
+        "updated_at" : "timestamp"
+    }
 }

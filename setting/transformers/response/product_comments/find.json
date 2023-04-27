@@ -3,6 +3,7 @@
     "parent_id":"",
     "user_id":"",
     "description":"",
+    "updated_at":"",
     "belongs_to":{
         "user":{
             "table":"users",
@@ -12,7 +13,9 @@
     },
     "filterable":{
         "id":"int",
-        "parent_id" : "int",
-        "description" : "string"
+        "parent_id":"int",
+        "user_id":"int",
+        "description":"string",
+        "updated_at":"timestamp"
     }
 }

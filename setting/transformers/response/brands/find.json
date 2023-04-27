@@ -1,4 +1,10 @@
 {
     "id":"",
-    "name":""
+    "name":"",
+    "slug":"",
+    "filterable":{
+        "id":"int",
+        "name" : "string",
+        "slug" : "string"
+    }
 }

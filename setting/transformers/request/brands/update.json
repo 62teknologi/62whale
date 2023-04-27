@@ -1,4 +1,4 @@
 {
-    "name":"",
-    "img_url":""
+    "name":"min:3|max:255",
+    "img_url":"min:3|max:255"
 }

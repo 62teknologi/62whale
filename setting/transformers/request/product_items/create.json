@@ -1,4 +1,4 @@
 {
-    "name":"required|min:3",
-    "image_url":""
+    "name":"required|min:3|max:255",
+    "image_url":"max:255"
 }

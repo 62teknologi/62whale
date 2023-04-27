@@ -1,5 +1,5 @@
 {
     "description":"required|min:3",
-    "parent_id":"",
-    "user_id":""
+    "parent_id":"number",
+    "user_id":"number"
 }

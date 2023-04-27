@@ -1,11 +1,11 @@
 module whale
 
-go 1.19
+go 1.18
 
 require (
 	github.com/gertd/go-pluralize v0.2.1
 	github.com/gin-gonic/gin v1.9.0
-	github.com/go-sql-driver/mysql v1.7.0
+	github.com/google/uuid v1.3.0
 	github.com/gosimple/slug v1.13.1
 	github.com/iancoleman/strcase v0.2.0
 	github.com/spf13/viper v1.15.0
@@ -22,8 +22,8 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.12.0 // indirect
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
-	github.com/google/uuid v1.3.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
