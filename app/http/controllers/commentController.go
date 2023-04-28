@@ -60,7 +60,7 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
-	pagination := utils.SetPagination(query, ctx)
+	filter["search"] = utils.SetFilterBySearchAble(query, transformer, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
 
 	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
@@ -68,6 +68,7 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 		return
 	}
 
+	pagination := utils.SetPagination(query, ctx)
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
 
 	if ctx.Query("include_childs") != "" {

@@ -56,7 +56,7 @@ func (ctrl *ItemController) FindAll(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table + "")
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
-	pagination := utils.SetPagination(query, ctx)
+	filter["search"] = utils.SetFilterBySearchAble(query, transformer, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
 
 	if err := query.Select(columns).Find(&values).Error; err != nil {
@@ -64,6 +64,7 @@ func (ctrl *ItemController) FindAll(ctx *gin.Context) {
 		return
 	}
 
+	pagination := utils.SetPagination(query, ctx)
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
 
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter))

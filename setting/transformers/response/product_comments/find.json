@@ -17,5 +17,6 @@
         "user_id":"int",
         "description":"string",
         "updated_at":"timestamp"
-    }
+    },
+    "searchable":["description"]
 }

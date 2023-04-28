@@ -17,5 +17,6 @@
         "size" : "string",
         "color" : "string",
         "updated_at" : "timestamp"
-    }
+    },
+    "searchable":["name"]
 }

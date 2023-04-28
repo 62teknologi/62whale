@@ -10,5 +10,6 @@
         "slug" : "string",
         "name" : "string",
         "updated_at" : "timestamp"
-    }
+    },
+    "searchable":["name"]
 }
