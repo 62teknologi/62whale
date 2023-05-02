@@ -1,82 +1,84 @@
-# Whale REST API
+# 62Whale
 
-Whale is a RESTful API written in Golang designed to manage user defined catalog data by 62teknologi.com.
+62Whale is a REST API written in Golang designed to manage user defined catalog data and can run independly as a stateless service.
 
-## Table of Contents
+The main goal of 62Whale is to reduce repetition of creating and managing catalog data.
 
-1. [Introduction](#introduction)
-2. [Catalog Description](#catalog-description)
-3. [Features](#features)
-4. [Installation](#installation)
-5. [API Endpoints](#api-endpoints)
-6. [Usage Examples](#usage-examples)
-7. [Contributing](#contributing)
-8. [License](#license)
+Created by 62teknologi.com, perfected by Community.
 
-## Introduction
+## Catalog
+This introduction will help You explain the concept and characteristic of catalog.
 
-Whale REST API is built with a focus on simplicity, reliability, and extensibility. With this API, users can manage catalog data for different whale species, including their names, scientific classifications, descriptions, images, and more.
+### Concept
 
-## Catalog Description
+Catalog is a collection of data, for example; products, articles, galleries.
 
-A catalog is a collection of information or data that describes a set of products, services, or other items.
+In the context of a 62Whale, a catalog would refer to a collection of `User Defined Data` that has certain `information`, `Behaviors`, `Associations` and `characteristic`.
 
-In the context of a whale REST API, a catalog would refer to a collection of `User Defined Data` that has certain `Behaviors` and `Associations`
+You will learn how to defined data on later section.
 
-###  Whale catalog behaviors
+### Information
+- Must Have ID
+- Must Have Slug
+- Must Have Created At
+- Must Have Updated At
+- Must Have Deleted At
+
+### Behaviors
 - can be created
 - can be retrieved
 - can be updated
 - can be deleted
 
-### Whale catalog associations
+### Associations
 - may has one category
 - may has many items
 - may has many to many groups
 - may has many comments
 - may belong to certain user 
 
-## Features
 
-- Easy-to-use RESTful API
-- Easy to setup
-- Easy to Customizable
-- Written in Golang for high performance and concurrency 
-- Robust data validation and error handling
-- Well-documented API endpoints
+## Running 62Whale
 
-## Installation
+Follow the instruction below to running 62Whale on Your local machine.
 
-To install and run Whale REST API on your local machine, follow these steps:
+### Prerequisites
+Make sure have preinstalled this prerequisites app before you continue to installation manual. we don't include how to install these app below Most of this prerequisites is a free app which you can find the "How to" installation tutorial anywhere in web and different machine os have different way to install.
+- MySql
 
-1. Clone the repository:
+### Installation manual
+This installation manual will guide You to running the binary on Your ubuntu or mac terminal.
 
-    git clone https://github.com/whale-rest-api.git
+1. Clone the repository
+```
+git clone https://github.com/62teknologi/62Whale
+```
 
-1. Change directory to the cloned repository:
+1. Change directory to the cloned repository
+```
+cd 62Whale
+```
 
-    cd whale-rest-api
+1. Create .env base on .env.example
+```
+cp .env.example .env
+```
 
-1. Build the application:
+1. change DB variable on .env using Your mysql configuration or the staging database on cloud server eg
+```
+HTTP_SERVER_ADDRESS=0.0.0.0:10081
+DB_DRIVER=mysql
+DB_SOURCE_1=root@tcp(127.0.0.1:3306)/whale_local
+```
 
-    go build
-
-1. Run the server:
-
-    ./whale-rest-api
+1. Run the server
+```
+./62whale
+```
 
 The API server will start running at `http://localhost:10081`. You can now interact with the API using your preferred API client or through the command line with `curl`.
 
-
-## Set Up a config (WIP)
-- copy .env.example
-
-## Generate a Catalog (WIP)
-- change directory to console
-- generate the catalogue
-  go catalogue.go [name]
-
-## API Endpoints
+### API Endpoints
 
 | Method | Endpoint | Description |
 | - | -| - |
@@ -86,17 +88,22 @@ The API server will start running at `http://localhost:10081`. You can now inter
 | PUT | /api/v1/catalog/:name/:id | Update information for a specific whale by ID |
 | DELETE | /api/v1/catalog/:name/:id | Delete a specific whale from the catalog by ID |
 
-For more detailed information about each endpoint, including request and response format, please refer to the [API documentation](./API_DOCUMENTATION.md).
+# Set Up a Catalog
+- WIP
 
-### Usage Examples  (WIP)
+## Generate Catalog
+- WIP
 
-Here are some examples of how to interact with the Whale REST API using `curl`:
+## Set Information
+- WIP
 
-1. Get a list of all whales:
-2. Get a specific whale by ID:
+## Set Validation
+- WIP
 
+## Set Associations
+- WIP
 
-## Contributing
+# Contributing
 
 If you'd like to contribute to the development of the Whale REST API, please follow these steps:
 
@@ -107,6 +114,22 @@ If you'd like to contribute to the development of the Whale REST API, please fol
 
 We appreciate your contributions and will review your pull request as soon as possible.
 
+## Must Preserve Characteristic 
+- Reduce repetition
+- Easy to use REST API
+- Easy to setup
+- Easy to Customizable
+- high performance
+- Robust data validation and error handling
+- Well documented API endpoints
+
 ## License
 
 This project is licensed under the MIT License. For more information, please see the [LICENSE](./LICENSE) file.
+
+# About 62
+**E.nam\Du.a**
+
+Indonesian language; spelling: A-num\Due-wa
+
+Origin: Enam Dua means ‘six-two’ or sixty two. It is Indonesia’s international country code (+62), that was also used as a meme word for “Indonesia” by “Indonesian internet citizen” (netizen) in social media.
