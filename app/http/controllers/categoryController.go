@@ -64,7 +64,7 @@ func (ctrl *CategoryController) FindAll(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
-	filter["search"] = utils.SetFilterBySearchAble(query, transformer, ctx)
+	filter["search"] = utils.SetGlobalSearch(query, transformer, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
 
 	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
