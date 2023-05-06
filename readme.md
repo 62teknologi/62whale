@@ -78,18 +78,66 @@ DB_SOURCE_1=root@tcp(127.0.0.1:3306)/whale_local
 
 The API server will start running at `http://localhost:10081`. You can now interact with the API using your preferred API client or through the command line with `curl`.
 
-### API Endpoints
+## API Endpoints
 
-| Method | Endpoint | Description |
-| - | -| - |
-| GET | /api/v1/catalog/:name | Retrieve a list of all whales in the catalog |
-| GET | /api/v1/catalog/:name/:id | Retrieve a specific whale by ID |
-| POST | /api/v1/catalog/:name | Add a new whale to the catalog |
-| PUT | /api/v1/catalog/:name/:id | Update information for a specific whale by ID |
-| DELETE | /api/v1/catalog/:name/:id | Delete a specific whale from the catalog by ID |
+### Retrieve Catalog by id
 
+#### Endpoint
+```
+GET /api/v1/catalog/:name/:id
+```
+
+### Retrieve Catalog List
+
+#### Endpoint
+```
+GET /api/v1/catalog/:name
+```
+
+#### Parameter
+| Name | Def | Description |
+| - | - | - |
+| page | 1 | return response in pagination format, eg: ```page=1``` will return first page of the response    |
+| per_page | 30 | set how many data per pagination response |
+| search | null | filter response by string |
+| :field | null | filter specific column you want, eg: if your catalog have ```user_id``` field then you can add ```user_id=1``` to params for searching all catalog where user_id is 1. it support multi value by sending ```user_id[]``` instead ```user_id``` |
+
+### Create Catalog
+
+#### Endpoint
+```
+POST /api/v1/catalog/:name
+```
+
+#### Parameter
+| Name | Def | Description |
+| - | - | - |
+| :field | null | field you want to insert |
+| groups[] | null | lorem |
+| items[] | null | lorem |
+
+
+### Update Catalog
+
+#### Endpoint
+```
+PUT /api/v1/catalog/:name/:id
+```
+
+#### Parameter
+| Name | Def | Description |
+| - | - | - |
+| :field | null | field you want to insert |
+| groups[] | null | lorem |
+
+### Delete Catalog
+
+#### Endpoint
+```
+DEL /api/v1/catalog/:name/:id
+```
 # Set Up a Catalog
-- WIP
+- WIP   
 
 ## Generate Catalog
 - WIP
