@@ -1,4 +1,5 @@
 {
     "name":"required|max:255|min:3",
+    "slug":"",
     "img_url":"max:255"
 }

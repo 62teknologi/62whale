@@ -6,6 +6,8 @@ import (
 	"whale/62teknologi-golang-utility/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/gosimple/slug"
 )
 
 type CommentController struct {
@@ -61,7 +63,11 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	filter["search"] = utils.SetGlobalSearch(query, transformer, ctx)
+
+	utils.SetOrderByQuery(query, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
+
+	delete(transformer, "filterable")
 
 	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
@@ -99,6 +105,13 @@ func (ctrl *CommentController) Create(ctx *gin.Context) {
 		return
 	}
 
+	if input["name"] != nil && transformer["slug"] == "" {
+		name, _ := input["name"].(string)
+		transformer["slug"] = slug.Make(name)
+	} else if transformer["slug"] == "" {
+		transformer["slug"] = uuid.New()
+	}
+
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
@@ -124,6 +137,12 @@ func (ctrl *CommentController) Update(ctx *gin.Context) {
 	if validation, err := utils.Validate(input, transformer); err {
 		ctx.JSON(http.StatusOK, utils.ResponseData("failed", "validation", validation.Errors))
 		return
+	}
+
+	// not sure is it needed or not, may confusing if slug changes
+	if input["name"] != nil && transformer["slug"] == "" {
+		name, _ := input["name"].(string)
+		transformer["slug"] = slug.Make(name)
 	}
 
 	utils.MapValuesShifter(transformer, input)

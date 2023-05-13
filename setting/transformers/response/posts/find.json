@@ -1,6 +1,7 @@
 {
     "id":"",
     "user_id":"",
+    "slug":"",
     "description":"",
     "belongs_to":{
         "user":{

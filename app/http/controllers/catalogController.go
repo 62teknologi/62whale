@@ -55,21 +55,24 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
-	order := "id desc"
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.PluralName + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	filter["search"] = utils.SetGlobalSearch(query, transformer, ctx)
+
+	utils.SetOrderByQuery(query, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
 
-	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
+	delete(transformer, "filterable")
+
+	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
 		return
 	}
 
 	pagination := utils.SetPagination(query, ctx)
-
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
+
 	utils.MultiAttachHasMany(customResponses)
 
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter))
@@ -91,6 +94,13 @@ func (ctrl *CatalogController) Create(ctx *gin.Context) {
 		return
 	}
 
+	if input["name"] != nil && transformer["slug"] == "" {
+		name, _ := input["name"].(string)
+		transformer["slug"] = slug.Make(name)
+	} else if transformer["slug"] == "" {
+		transformer["slug"] = uuid.New()
+	}
+
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
@@ -99,15 +109,6 @@ func (ctrl *CatalogController) Create(ctx *gin.Context) {
 
 	delete(transformer, "items")
 	delete(transformer, "groups")
-
-	var name string
-
-	if transformer["name"] != nil {
-		name, _ = transformer["name"].(string)
-		transformer["slug"] = slug.Make(name)
-	} else {
-		transformer["slug"] = uuid.New()
-	}
 
 	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Table(ctrl.PluralName).Create(&transformer).Error; err != nil {
@@ -163,6 +164,12 @@ func (ctrl *CatalogController) Update(ctx *gin.Context) {
 		return
 	}
 
+	// not sure is it needed or not, may confusing if slug changes
+	if input["name"] != nil && transformer["slug"] == "" {
+		name, _ := input["name"].(string)
+		transformer["slug"] = slug.Make(name)
+	}
+
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
@@ -171,14 +178,6 @@ func (ctrl *CatalogController) Update(ctx *gin.Context) {
 
 	delete(transformer, "items")
 	delete(transformer, "groups")
-
-	var name string
-
-	if transformer["name"] != nil {
-		name, _ = transformer["name"].(string)
-		// not sure is it needed or not, may confusing if slug changes
-		transformer["slug"] = slug.Make(name)
-	}
 
 	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {

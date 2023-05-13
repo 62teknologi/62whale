@@ -1,4 +1,5 @@
 {
     "name":"required|min:3|max:255",
+    "slug":"",
     "parent_id":"number"
 }

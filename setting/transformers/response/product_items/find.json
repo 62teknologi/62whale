@@ -1,5 +1,6 @@
 {
     "id":"",
+    "product_id":"",
     "name":"",
     "price":"",
     "weight":"",
@@ -11,6 +12,7 @@
     "updated_at":"",
     "filterable":{
         "id":"int",
+        "product_id":"",
         "name" : "string",
         "price" : "int",
         "weight" : "int",

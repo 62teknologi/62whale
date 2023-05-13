@@ -1,5 +1,6 @@
 {
     "name":"required|min:3|max:255",
+    "slug":"",
     "user_id":"required|number",
     "product_category_id":"required|number",
     "brand_id":"number",

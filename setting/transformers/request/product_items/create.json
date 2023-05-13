@@ -1,4 +1,10 @@
 {
     "name":"required|min:3|max:255",
-    "image_url":"max:255"
-}
+    "product_id":"required",
+    "price":"required",
+    "weight":"required",
+    "stock":"required",
+    "size":"required",
+    "color":"required",
+    "status_id":""
+}   

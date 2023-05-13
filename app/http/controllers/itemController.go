@@ -57,7 +57,11 @@ func (ctrl *ItemController) FindAll(ctx *gin.Context) {
 	query := utils.DB.Table(ctrl.Table + "")
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	filter["search"] = utils.SetGlobalSearch(query, transformer, ctx)
+
+	utils.SetOrderByQuery(query, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
+
+	delete(transformer, "filterable")
 
 	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
@@ -86,17 +90,15 @@ func (ctrl *ItemController) Create(ctx *gin.Context) {
 		return
 	}
 
-	utils.MapValuesShifter(transformer, input)
-	utils.MapNullValuesRemover(transformer)
-
-	var name string
-
-	if transformer["name"] != nil {
-		name, _ = transformer["name"].(string)
+	if input["name"] != nil && transformer["slug"] == "" {
+		name, _ := input["name"].(string)
 		transformer["slug"] = slug.Make(name)
-	} else {
+	} else if transformer["slug"] == "" {
 		transformer["slug"] = uuid.New()
 	}
+
+	utils.MapValuesShifter(transformer, input)
+	utils.MapNullValuesRemover(transformer)
 
 	if err := utils.DB.Table(ctrl.Table + "").Create(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
@@ -122,16 +124,14 @@ func (ctrl *ItemController) Update(ctx *gin.Context) {
 		return
 	}
 
-	utils.MapValuesShifter(transformer, input)
-	utils.MapNullValuesRemover(transformer)
-
-	var name string
-
-	if transformer["name"] != nil {
-		name, _ = transformer["name"].(string)
-		// not sure is it needed or not, may confusing if slug changes
+	// not sure is it needed or not, may confusing if slug changes
+	if input["name"] != nil && transformer["slug"] == "" {
+		name, _ := input["name"].(string)
 		transformer["slug"] = slug.Make(name)
 	}
+
+	utils.MapValuesShifter(transformer, input)
+	utils.MapNullValuesRemover(transformer)
 
 	if err := utils.DB.Table(ctrl.Table+"").Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
