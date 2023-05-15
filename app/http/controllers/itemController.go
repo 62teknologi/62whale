@@ -32,7 +32,7 @@ func (ctrl *ItemController) Find(ctx *gin.Context) {
 	columns := []string{ctrl.Table + ".*"}
 	order := "id desc"
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
-	query := utils.DB.Table(ctrl.Table + "")
+	query := utils.DB.Table(ctrl.Table)
 
 	utils.SetBelongsTo(query, transformer, &columns)
 	delete(transformer, "filterable")
@@ -54,7 +54,7 @@ func (ctrl *ItemController) FindAll(ctx *gin.Context) {
 	values := []map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
-	query := utils.DB.Table(ctrl.Table + "")
+	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	filter["search"] = utils.SetGlobalSearch(query, transformer, ctx)
 
@@ -62,6 +62,7 @@ func (ctrl *ItemController) FindAll(ctx *gin.Context) {
 	utils.SetBelongsTo(query, transformer, &columns)
 
 	delete(transformer, "filterable")
+	delete(transformer, "searchable")
 
 	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
@@ -100,7 +101,7 @@ func (ctrl *ItemController) Create(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	if err := utils.DB.Table(ctrl.Table + "").Create(&transformer).Error; err != nil {
+	if err := utils.DB.Table(ctrl.Table).Create(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
@@ -133,7 +134,7 @@ func (ctrl *ItemController) Update(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	if err := utils.DB.Table(ctrl.Table+"").Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
+	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
@@ -145,7 +146,7 @@ func (ctrl *ItemController) Update(ctx *gin.Context) {
 func (ctrl *ItemController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	if err := utils.DB.Table(ctrl.Table+"").Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
+	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}

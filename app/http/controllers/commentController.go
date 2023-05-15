@@ -58,7 +58,6 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
-	order := "id desc"
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
@@ -68,8 +67,9 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 	utils.SetBelongsTo(query, transformer, &columns)
 
 	delete(transformer, "filterable")
+	delete(transformer, "searchable")
 
-	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
+	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
 		return
 	}

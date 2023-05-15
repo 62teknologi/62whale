@@ -64,6 +64,7 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 	utils.SetBelongsTo(query, transformer, &columns)
 
 	delete(transformer, "filterable")
+	delete(transformer, "searchable")
 
 	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))

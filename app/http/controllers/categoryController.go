@@ -62,14 +62,18 @@ func (ctrl *CategoryController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
-	order := "id desc"
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	filter["search"] = utils.SetGlobalSearch(query, transformer, ctx)
+
+	utils.SetOrderByQuery(query, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
 
-	if err := query.Select(columns).Order(order).Find(&values).Error; err != nil {
+	delete(transformer, "filterable")
+	delete(transformer, "searchable")
+
+	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
 		return
 	}
