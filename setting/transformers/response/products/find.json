@@ -45,7 +45,7 @@
     "id": "int",
     "user_id": "int",
     "status_id": "int",
-    "product_category_id ": "int",
+    "product_category_id": "int",
     "slug": "string",
     "name": "string",
     "length": "int",

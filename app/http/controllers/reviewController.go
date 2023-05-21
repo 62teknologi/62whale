@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
-	"strconv"
 	"whale/62teknologi-golang-utility/utils"
 
 	"github.com/gin-gonic/gin"
@@ -11,7 +9,7 @@ import (
 	"github.com/gosimple/slug"
 )
 
-type CategoryController struct {
+type ReviewController struct {
 	SingularName  string
 	PluralName    string
 	SingularLabel string
@@ -19,45 +17,38 @@ type CategoryController struct {
 	Table         string
 }
 
-func (ctrl *CategoryController) Init(ctx *gin.Context) {
+func (ctrl *ReviewController) Init(ctx *gin.Context) {
 	ctrl.SingularName = utils.Pluralize.Singular(ctx.Param("table"))
 	ctrl.PluralName = utils.Pluralize.Plural(ctx.Param("table"))
-	ctrl.SingularLabel = ctrl.SingularName + " category"
-	ctrl.PluralLabel = ctrl.SingularName + " categories"
-	ctrl.Table = ctrl.SingularName + "_categories"
+	ctrl.SingularLabel = ctrl.SingularName + " review"
+	ctrl.PluralLabel = ctrl.SingularName + " reviews"
+	ctrl.Table = ctrl.SingularName + "_reviews"
 }
 
-func (ctrl *CategoryController) Find(ctx *gin.Context) {
+func (ctrl *ReviewController) Find(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	value := map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
+	order := "id desc"
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 
-	utils.SetOrderByQuery(query, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
-
 	delete(transformer, "filterable")
 
-	if err := query.Select(columns).Where(ctrl.Table+".id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.SingularName+" not found", nil))
+	if err := query.Select(columns).Order(order).Where(ctrl.Table+"."+"id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.SingularLabel+" not found", nil))
 		return
 	}
 
 	utils.MapValuesShifter(transformer, value)
 	utils.AttachBelongsTo(transformer, value)
 
-	if transformer["id"] != nil {
-		total := int32(1)
-		transformer["childs"] = ctrl.FetchChild(transformer["id"].(int32), []string{}, &total)
-		fmt.Printf("total queries for "+ctrl.Table+" where parent id %d is %d\n", transformer["id"], total)
-	}
-
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *CategoryController) FindAll(ctx *gin.Context) {
+func (ctrl *ReviewController) FindAll(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	values := []map[string]any{}
@@ -82,20 +73,10 @@ func (ctrl *CategoryController) FindAll(ctx *gin.Context) {
 
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
 
-	if ctx.Query("include_childs") != "" {
-		var total int32 = 1
-		for _, value := range customResponses {
-			if value["id"] != nil {
-				value["childs"] = ctrl.FetchChild(value["id"].(int32), []string{}, &total)
-			}
-		}
-		fmt.Printf("total queries for "+ctrl.Table+" is %d\n", total)
-	}
-
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter))
 }
 
-func (ctrl *CategoryController) Create(ctx *gin.Context) {
+func (ctrl *ReviewController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.Table + "/create.json")
@@ -129,7 +110,7 @@ func (ctrl *CategoryController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *CategoryController) Update(ctx *gin.Context) {
+func (ctrl *ReviewController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.Table + "/update.json")
@@ -163,7 +144,7 @@ func (ctrl *CategoryController) Update(ctx *gin.Context) {
 }
 
 // todo : need to check constraint error
-func (ctrl *CategoryController) Delete(ctx *gin.Context) {
+func (ctrl *ReviewController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
@@ -172,26 +153,4 @@ func (ctrl *CategoryController) Delete(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "delete "+ctrl.SingularLabel+" success", nil))
-}
-
-// todo : this will generate N queries of N row. need cached mechanism to prevent that.
-func (ctrl *CategoryController) FetchChild(id int32, sequence []string, total *int32) []map[string]any {
-	*total = *total + 1
-	var values []map[string]any
-
-	sequence = append(sequence, strconv.Itoa(int(int32(id))))
-
-	if err := utils.DB.Table(ctrl.Table).Where("parent_id = ?", id).Where("id NOT IN ?", sequence).Find(&values).Error; err != nil {
-		return values
-	}
-
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
-	customResponses := utils.MultiMapValuesShifter(transformer, values)
-
-	for _, value := range customResponses {
-		value["childs"] = ctrl.FetchChild(value["id"].(int32), sequence, total)
-		delete(value, "filterable")
-	}
-
-	return customResponses
 }

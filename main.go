@@ -34,6 +34,7 @@ func main() {
 		RegisterRoute(apiV1, "catalog", &controllers.CatalogController{})
 		RegisterRoute(apiV1, "group", &controllers.GroupController{})
 		RegisterRoute(apiV1, "item", &controllers.ItemController{})
+		RegisterRoute(apiV1, "review", &controllers.ReviewController{})
 	}
 
 	r.GET("/health", func(c *gin.Context) {
@@ -50,6 +51,7 @@ func main() {
 
 func RegisterRoute(r gin.IRoutes, t string, c interfaces.Crud) {
 	r.GET("/"+t+"/:table/:id", c.Find)
+	r.GET("/"+t+"/:table/slug/:slug", c.Find)
 	r.GET("/"+t+"/:table", c.FindAll)
 	r.POST("/"+t+"/:table", c.Create)
 	r.PUT("/"+t+"/:table/:id", c.Update)

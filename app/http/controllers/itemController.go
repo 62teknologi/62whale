@@ -64,12 +64,13 @@ func (ctrl *ItemController) FindAll(ctx *gin.Context) {
 	delete(transformer, "filterable")
 	delete(transformer, "searchable")
 
+	pagination := utils.SetPagination(query, ctx)
+
 	if err := query.Select(columns).Find(&values).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
 		return
 	}
 
-	pagination := utils.SetPagination(query, ctx)
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
 
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter))
