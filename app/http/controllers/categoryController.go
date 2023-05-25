@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
-	"whale/62teknologi-golang-utility/utils"
+
+	"github.com/62teknologi/62whale/62golib/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

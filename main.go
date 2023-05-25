@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"whale/62teknologi-golang-utility/utils"
-	"whale/app/http/controllers"
-	"whale/app/http/middlewares"
-	"whale/app/interfaces"
-	"whale/config"
+
+	"github.com/62teknologi/62whale/62golib/utils"
+	"github.com/62teknologi/62whale/app/http/controllers"
+	"github.com/62teknologi/62whale/app/http/middlewares"
+	"github.com/62teknologi/62whale/app/interfaces"
+	"github.com/62teknologi/62whale/config"
 
 	"github.com/gin-gonic/gin"
 )

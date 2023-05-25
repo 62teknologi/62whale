@@ -1,3 +1,3 @@
-[submodule "62teknologi-golang-utility"]
-	path = 62teknologi-golang-utility
-	url = git@gitlab.62teknologi.com:62teknologi/62teknologi-golang-utility.git
+[submodule "62golib"]
+	path = 62golib
+	url = git@github.com:62teknologi/62golib.git

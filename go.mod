@@ -1,4 +1,4 @@
-module whale
+module github.com/62teknologi/62whale
 
 go 1.18
 
