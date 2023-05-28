@@ -81,12 +81,7 @@ func (ctrl *ItemController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.Table + "/create.json")
-	var input map[string]any
-
-	if err := ctx.BindJSON(&input); err != nil {
-		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
-		return
-	}
+	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
 		ctx.JSON(http.StatusOK, utils.ResponseData("failed", "validation", validation.Errors))
@@ -115,12 +110,7 @@ func (ctrl *ItemController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.Table + "/update.json")
-	var input map[string]any
-
-	if err := ctx.BindJSON(&input); err != nil {
-		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
-		return
-	}
+	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
 		ctx.JSON(http.StatusOK, utils.ResponseData("failed", "validation", validation.Errors))
