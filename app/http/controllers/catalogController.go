@@ -211,6 +211,8 @@ func (ctrl *CatalogController) Update(ctx *gin.Context) {
 
 // todo : need to check constraint error
 func (ctrl *CatalogController) Delete(ctx *gin.Context) {
+	ctrl.Init(ctx)
+
 	if err := utils.DB.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
