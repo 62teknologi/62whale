@@ -62,7 +62,7 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
-	filter["search"] = utils.SetGlobalSearch(query, transformer, ctx)
+	search := utils.SetGlobalSearch(query, transformer, ctx)
 
 	utils.SetOrderByQuery(query, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
@@ -78,6 +78,7 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 	}
 
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
+	summary := utils.GetSummary(transformer, values)
 
 	if ctx.Query("include_childs") != "" {
 		total := int32(1)
@@ -88,7 +89,7 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 		}
 	}
 
-	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter))
+	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter, search, summary))
 }
 
 func (ctrl *CommentController) Create(ctx *gin.Context) {

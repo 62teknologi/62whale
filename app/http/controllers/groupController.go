@@ -59,7 +59,7 @@ func (ctrl *GroupController) FindAll(ctx *gin.Context) {
 	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
-	filter["search"] = utils.SetGlobalSearch(query, transformer, ctx)
+	search := utils.SetGlobalSearch(query, transformer, ctx)
 
 	utils.SetOrderByQuery(query, ctx)
 	utils.SetBelongsTo(query, transformer, &columns)
@@ -75,8 +75,9 @@ func (ctrl *GroupController) FindAll(ctx *gin.Context) {
 	}
 
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
+	summary := utils.GetSummary(transformer, values)
 
-	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter))
+	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter, search, summary))
 }
 
 func (ctrl *GroupController) Create(ctx *gin.Context) {
