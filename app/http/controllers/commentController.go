@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/62teknologi/62whale/62golib/utils"
+	"github.com/62teknologi/62whale/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -32,7 +33,7 @@ func (ctrl *CommentController) Find(ctx *gin.Context) {
 
 	value := map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
+	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 
 	utils.SetBelongsTo(query, transformer, &columns)
@@ -59,7 +60,7 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
+	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	search := utils.SetGlobalSearch(query, transformer, ctx)
@@ -95,7 +96,7 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 func (ctrl *CommentController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.Table + "/create.json")
+	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/create.json")
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
@@ -124,7 +125,7 @@ func (ctrl *CommentController) Create(ctx *gin.Context) {
 func (ctrl *CommentController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.Table + "/update.json")
+	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/update.json")
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
@@ -172,7 +173,7 @@ func (ctrl *CommentController) FetchChild(id int32, sequence []string, total *in
 		return values
 	}
 
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.Table + "/find.json")
+	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
 
 	for _, value := range customResponses {

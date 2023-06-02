@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/62teknologi/62whale/62golib/utils"
+	"github.com/62teknologi/62whale/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -33,7 +34,7 @@ func (ctrl *CatalogController) Find(ctx *gin.Context) {
 
 	value := map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.PluralName + "/find.json")
+	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
 	query := utils.DB.Table(ctrl.PluralName)
 
 	utils.SetBelongsTo(query, transformer, &columns)
@@ -56,7 +57,7 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
-	transformer, _ := utils.JsonFileParser("setting/transformers/response/" + ctrl.PluralName + "/find.json")
+	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	search := utils.SetGlobalSearch(query, transformer, ctx)
@@ -85,7 +86,7 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 func (ctrl *CatalogController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.PluralName + "/create.json")
+	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/create.json")
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
@@ -150,7 +151,7 @@ func (ctrl *CatalogController) Create(ctx *gin.Context) {
 func (ctrl *CatalogController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser("setting/transformers/request/" + ctrl.PluralName + "/update.json")
+	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/update.json")
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {

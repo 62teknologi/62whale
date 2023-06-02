@@ -15,14 +15,14 @@ import (
 
 func main() {
 
-	config, err := config.LoadConfig(".")
+	configs, err := config.LoadConfig(".", &config.Data)
 	if err != nil {
 		fmt.Printf("cannot load config: %w", err)
 		return
 	}
 
 	// todo : replace last variable with spread notation "..."
-	utils.ConnectDatabase(config.DBDriver, config.DBSource1, config.DBSource2)
+	utils.ConnectDatabase(configs.DBDriver, configs.DBSource1, configs.DBSource2)
 
 	utils.InitPluralize()
 
@@ -42,7 +42,7 @@ func main() {
 		c.JSON(http.StatusOK, utils.ResponseData("success", "Server running well", nil))
 	})
 
-	err = r.Run(config.HTTPServerAddress)
+	err = r.Run(configs.HTTPServerAddress)
 
 	if err != nil {
 		fmt.Printf("cannot run server: %w", err)
