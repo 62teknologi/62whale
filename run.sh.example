@@ -1,0 +1,7 @@
+#run whale
+echo "killing port 10081"
+sudo kill -9 $(sudo lsof -t -i:10081)  || true
+echo "build whale"
+go build main.go
+echo "running go whale"
+nohup ./main &
