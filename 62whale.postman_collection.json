@@ -1,11 +1,577 @@
 {
 	"info": {
-		"_postman_id": "fe2c48f9-0a2f-4241-95c6-18b0e064d184",
-		"name": "whale",
+		"_postman_id": "e79c3429-ea55-411b-b375-3e0fa6942e4f",
+		"name": "62whale",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "4975546"
 	},
 	"item": [
+		{
+			"name": "posts",
+			"item": [
+				{
+					"name": "catalog",
+					"item": [
+						{
+							"name": "all",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/posts",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"posts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/posts/1",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"posts",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "insert",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"user_id\":\"{{$randomInt}}\",\n    \"description\":\"{{$randomLoremParagraph}}\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/posts?ok=ok",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"posts"
+									],
+									"query": [
+										{
+											"key": "ok",
+											"value": "ok"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"items\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[3,2]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/posts/12",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"posts",
+										"12"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"items\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/posts/12",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"posts",
+										"12"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "comment",
+					"item": [
+						{
+							"name": "all",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/comment/posts?include_childs=true",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"comment",
+										"posts"
+									],
+									"query": [
+										{
+											"key": "parent_id[]",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "parent_id[]",
+											"value": "59",
+											"disabled": true
+										},
+										{
+											"key": "description",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "page",
+											"value": "1",
+											"disabled": true
+										},
+										{
+											"key": "include_childs",
+											"value": "true"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/comment/posts/1?with=childs,ok",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"comment",
+										"posts",
+										"1"
+									],
+									"query": [
+										{
+											"key": "with",
+											"value": "childs,ok"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "insert",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"parent_id\":\"\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/comment/posts?ok=ok&parent_id=1",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"comment",
+										"posts"
+									],
+									"query": [
+										{
+											"key": "ok",
+											"value": "ok"
+										},
+										{
+											"key": "parent_id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"items\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[3,2]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/comment/posts/12",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"comment",
+										"posts",
+										"12"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"user_id\":1,\n    \"parent_id\":1\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/comment/posts/1",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"comment",
+										"posts",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "brands",
+			"item": [
+				{
+					"name": "catalog",
+					"item": [
+						{
+							"name": "all",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/brands?id[]=32&id[]=33&name=1682585646&slug=1682585646&page=1&per_page=10",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"brands"
+									],
+									"query": [
+										{
+											"key": "id[]",
+											"value": "32"
+										},
+										{
+											"key": "id[]",
+											"value": "33"
+										},
+										{
+											"key": "name",
+											"value": "1682585646"
+										},
+										{
+											"key": "slug",
+											"value": "1682585646"
+										},
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "per_page",
+											"value": "10"
+										},
+										{
+											"key": "search",
+											"value": "silk",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "find",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/brands/1",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"brands",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "insert",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\",\n    \"img_url\":\"https://picsum.photos/id/{{1to300}}/450/300\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/brands",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"brands"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"items\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[3,2]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/posts/12",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"posts",
+										"12"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"items\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{host}}/api/v1/catalog/posts/12",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"catalog",
+										"posts",
+										"12"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
 		{
 			"name": "products",
 			"item": [
@@ -30,12 +596,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/products?description=eiciendis&slug=1682585752&order[]=updated_at&order[]=id desc&order[]=description",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/catalog/products?page=2&per_page=3&search=quod",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -54,13 +618,24 @@
 											"disabled": true
 										},
 										{
-											"key": "id",
+											"key": "id[]",
 											"value": "92",
 											"disabled": true
 										},
 										{
+											"key": "id[]",
+											"value": "93",
+											"disabled": true
+										},
+										{
+											"key": "id[]",
+											"value": "1",
+											"disabled": true
+										},
+										{
 											"key": "description",
-											"value": "eiciendis"
+											"value": "eiciendis",
+											"disabled": true
 										},
 										{
 											"key": "status_id",
@@ -74,7 +649,8 @@
 										},
 										{
 											"key": "slug",
-											"value": "1682585752"
+											"value": "1682539585",
+											"disabled": true
 										},
 										{
 											"key": "length",
@@ -108,8 +684,7 @@
 										},
 										{
 											"key": "page",
-											"value": "2",
-											"disabled": true
+											"value": "2"
 										},
 										{
 											"key": "updated_at",
@@ -118,20 +693,11 @@
 										},
 										{
 											"key": "per_page",
-											"value": "10",
-											"disabled": true
+											"value": "3"
 										},
 										{
-											"key": "order[]",
-											"value": "updated_at"
-										},
-										{
-											"key": "order[]",
-											"value": "id desc"
-										},
-										{
-											"key": "order[]",
-											"value": "description"
+											"key": "search",
+											"value": "quod"
 										}
 									]
 								}
@@ -156,12 +722,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/products/82",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/catalog/products/82",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -188,12 +752,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/products?ok=ok",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/catalog/products?ok=ok",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -225,12 +787,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/products/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/catalog/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -257,12 +817,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/products/5",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/catalog/products/5",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -297,12 +855,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/category/products?page=2&per_page=10",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/category/products?page=2&per_page=10",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -357,6 +913,11 @@
 										{
 											"key": "per_page",
 											"value": "10"
+										},
+										{
+											"key": "search",
+											"value": "quod",
+											"disabled": true
 										}
 									]
 								}
@@ -381,12 +942,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/category/products/1",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/category/products/1",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -413,12 +972,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/category/products",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/category/products",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -444,12 +1001,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/category/products/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/category/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -476,12 +1031,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/category/products/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/category/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -516,12 +1069,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/products?include_childs=true&user_id=18&description=shirt&updated_at=2023-04-27&per_page=10",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/comment/products?include_childs=true&user_id=18&description=shirt&updated_at=2023-04-27&per_page=10",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -573,6 +1124,11 @@
 										{
 											"key": "per_page",
 											"value": "10"
+										},
+										{
+											"key": "search",
+											"value": "quod",
+											"disabled": true
 										}
 									]
 								}
@@ -597,12 +1153,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/products/1?with=childs,ok",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/comment/products/1?with=childs,ok",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -635,12 +1189,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/products?ok=ok",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/comment/products?ok=ok",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -672,12 +1224,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/products/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/comment/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -704,12 +1254,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/products/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/comment/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -744,12 +1292,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/group/products?page=1&per_page=10",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/group/products?page=1&per_page=10",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -779,6 +1325,11 @@
 										{
 											"key": "per_page",
 											"value": "10"
+										},
+										{
+											"key": "search",
+											"value": "test",
+											"disabled": true
 										}
 									]
 								}
@@ -803,12 +1354,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/group/products/5",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/group/products/5",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -835,12 +1384,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/group/products?ok=ok",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/group/products?ok=ok",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -872,12 +1419,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/group/products/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/group/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -904,12 +1449,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/group/products/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/group/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -944,12 +1487,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/item/products",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/item/products",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -1006,6 +1547,11 @@
 											"key": "per_page",
 											"value": "10",
 											"disabled": true
+										},
+										{
+											"key": "search",
+											"value": "ilham",
+											"disabled": true
 										}
 									]
 								}
@@ -1030,12 +1576,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/item/products/61",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/item/products/61",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -1054,7 +1598,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\",\n    \"product_id\":\"60\",\n    \"price\":\"1\",\n    \"weight\":\"1\",\n    \"stock\":\"{{1to3}}\",\n    \"size\":\"{{1to3}}\",\n    \"color\":\"{{$randomColor}}\"\n}   ",
+									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1062,12 +1606,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/item/products?ok=ok",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/item/products?ok=ok",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -1099,12 +1641,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/item/products/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/item/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -1131,12 +1671,10 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/item/products/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/item/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
@@ -1149,189 +1687,9 @@
 							"response": []
 						}
 					]
-				}
-			]
-		},
-		{
-			"name": "posts",
-			"item": [
-				{
-					"name": "catalog",
-					"item": [
-						{
-							"name": "all",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/posts",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"catalog",
-										"posts"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "find",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/posts/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"catalog",
-										"posts",
-										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "insert",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"user_id\":\"{{$randomInt}}\",\n    \"description\":\"{{$randomLoremParagraph}}\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/posts?ok=ok",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"catalog",
-										"posts"
-									],
-									"query": [
-										{
-											"key": "ok",
-											"value": "ok"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "delete",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"items\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[3,2]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/posts/12",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"catalog",
-										"posts",
-										"12"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "update",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"items\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/posts/12",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"catalog",
-										"posts",
-										"12"
-									]
-								}
-							},
-							"response": []
-						}
-					]
 				},
 				{
-					"name": "comment",
+					"name": "review",
 					"item": [
 						{
 							"name": "all",
@@ -1351,253 +1709,55 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/posts?include_childs=true",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/review/products",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
-										"comment",
-										"posts"
-									],
-									"query": [
-										{
-											"key": "parent_id[]",
-											"value": "1",
-											"disabled": true
-										},
-										{
-											"key": "parent_id[]",
-											"value": "59",
-											"disabled": true
-										},
-										{
-											"key": "description",
-											"value": "1",
-											"disabled": true
-										},
-										{
-											"key": "page",
-											"value": "1",
-											"disabled": true
-										},
-										{
-											"key": "include_childs",
-											"value": "true"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "find",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/posts/1?with=childs,ok",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"comment",
-										"posts",
-										"1"
-									],
-									"query": [
-										{
-											"key": "with",
-											"value": "childs,ok"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "insert",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"description\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"parent_id\":\"\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/posts?ok=ok&parent_id=1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"comment",
-										"posts"
-									],
-									"query": [
-										{
-											"key": "ok",
-											"value": "ok"
-										},
-										{
-											"key": "parent_id",
-											"value": "1"
-										}
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "delete",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"items\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[3,2]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/posts/12",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"comment",
-										"posts",
-										"12"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "update",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"user_id\":1,\n    \"parent_id\":1\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/comment/posts/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"comment",
-										"posts",
-										"1"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				}
-			]
-		},
-		{
-			"name": "brands",
-			"item": [
-				{
-					"name": "catalog",
-					"item": [
-						{
-							"name": "all",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$guid}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"skus\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2,3,5]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/brands",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "10081",
-									"path": [
-										"api",
-										"v1",
-										"catalog",
-										"brands"
+										"review",
+										"products"
 									],
 									"query": [
 										{
 											"key": "id[]",
-											"value": "32",
+											"value": "61",
 											"disabled": true
 										},
 										{
 											"key": "id[]",
-											"value": "33",
+											"value": "62",
 											"disabled": true
 										},
 										{
 											"key": "name",
-											"value": "1682585646",
+											"value": "7055612f1504",
 											"disabled": true
 										},
 										{
-											"key": "slug",
-											"value": "1682585646",
+											"key": "price",
+											"value": "763",
+											"disabled": true
+										},
+										{
+											"key": "weight",
+											"value": "542",
+											"disabled": true
+										},
+										{
+											"key": "size",
+											"value": "168",
+											"disabled": true
+										},
+										{
+											"key": "color",
+											"value": "sky",
+											"disabled": true
+										},
+										{
+											"key": "updated_at",
+											"value": "2023-04-27",
 											"disabled": true
 										},
 										{
@@ -1609,6 +1769,11 @@
 											"key": "per_page",
 											"value": "10",
 											"disabled": true
+										},
+										{
+											"key": "search",
+											"value": "ilham",
+											"disabled": true
 										}
 									]
 								}
@@ -1633,17 +1798,15 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/brands/1",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/review/products/1",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
-										"catalog",
-										"brands",
+										"review",
+										"products",
 										"1"
 									]
 								}
@@ -1657,7 +1820,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\",\n    \"img_url\":\"https://picsum.photos/id/{{1to300}}/450/300\"\n}",
+									"raw": "{\n    \"user_id\": \"{{1to3}}\",\n    \"description\": \"{{$randomLoremParagraph}}\",\n    \"rating\": \"{{1to5}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1665,17 +1828,21 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/brands",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/review/products?ok=ok",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
-										"catalog",
-										"brands"
+										"review",
+										"products"
+									],
+									"query": [
+										{
+											"key": "ok",
+											"value": "ok"
+										}
 									]
 								}
 							},
@@ -1696,17 +1863,15 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/posts/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/review/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
-										"catalog",
-										"posts",
+										"review",
+										"products",
 										"12"
 									]
 								}
@@ -1720,7 +1885,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\":\"{{$randomProduct}} {{$randomProductAdjective}} {{$timestamp}}\",\n    \"user_id\":\"1\",\n    \"description\":\"{{$randomLoremParagraph}}\",\n    \"length\":\"{{$randomInt}}\",\n    \"width\":\"{{$randomInt}}\",\n    \"height\":\"{{$randomInt}}\",\n    \"minimum_order\":\"{{$randomInt}}\",\n    \"is_need_insurance\":\"\",\n    \"is_new\":\"\",\n    \"status_id\":\"1\",\n    \"product_category_id\":\"1\",\n    \"items\":[{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    },{\n        \"name\":\"{{$guid}}\",\n        \"price\":\"{{$randomInt}}\",\n        \"weight\":\"{{$randomInt}}\",\n        \"stock\":\"{{$randomInt}}\",\n        \"size\":\"{{$randomInt}}\",\n        \"color\":\"{{$randomColor}}\",\n        \"custom_1\":\"{{$randomInt}}\",\n        \"status_id\":\"1\"\n    }],\n    \"groups\":[1,2]\n}",
+									"raw": "{\n    \"user_id\": \"{{1to3}}\",\n    \"description\": \"{{$randomLoremParagraph}}\",\n    \"rating\": \"{{1to5}}\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -1728,17 +1893,15 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:10081/api/v1/catalog/posts/12",
-									"protocol": "http",
+									"raw": "{{host}}/api/v1/review/products/12",
 									"host": [
-										"localhost"
+										"{{host}}"
 									],
-									"port": "10081",
 									"path": [
 										"api",
 										"v1",
-										"catalog",
-										"posts",
+										"review",
+										"products",
 										"12"
 									]
 								}
@@ -1767,12 +1930,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:10081/health",
-					"protocol": "http",
+					"raw": "{{host}}/health",
 					"host": [
-						"localhost"
+						"{{host}}"
 					],
-					"port": "10081",
 					"path": [
 						"health"
 					]
@@ -1789,6 +1950,8 @@
 				"exec": [
 					"// Set a variable with the random number",
 					"pm.variables.set(\"0to1\", Math.round(Math.random() + 0.3));",
+					"",
+					"pm.variables.set(\"1to5\", Math.floor(Math.random() * 5) + 1);",
 					"",
 					"pm.variables.set(\"1to10\", Math.floor(Math.random() * 10) + 1);",
 					"",
@@ -1825,6 +1988,13 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://localhost:10081",
+			"type": "string"
 		}
 	]
 }
