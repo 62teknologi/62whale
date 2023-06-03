@@ -1,8 +1,8 @@
-# 62Whale
+# 62whale
 
-62Whale is a REST API written in Golang designed to manage user defined catalog data and can run independly as a stateless service.
+62whale is a REST API written in Golang designed to manage user defined catalog data and can run independly as a stateless service.
 
-The main goal of 62Whale is to reduce repetition of creating and managing catalog data.
+The main goal of 62whale is to reduce repetition of creating and managing catalog data.
 
 Created by 62teknologi.com, perfected by Community.
 
@@ -13,9 +13,9 @@ This introduction will help You explain the concept and characteristic of catalo
 
 Catalog is a collection of data, for example; products, articles, galleries.
 
-In the context of a 62Whale, a catalog would refer to a collection of `User Defined Data` that has certain `information`, `Behaviors`, `Associations` and `characteristic`.
+In the context of a 62whale, a catalog would refer to a collection of `User Defined Data` that has certain `Information`, `Behaviors`, `Associations` and `Characteristic`.
 
-You will learn how to defined data on later section.
+You will learn how to define data on later section.
 
 ### Information
 - Must Have ID
@@ -38,25 +38,31 @@ You will learn how to defined data on later section.
 - may belong to certain user 
 
 
-## Running 62Whale
+## Running 62whale
 
-Follow the instruction below to running 62Whale on Your local machine.
+Follow the instruction below to running 62whale on Your local machine.
 
 ### Prerequisites
-Make sure have preinstalled this prerequisites app before you continue to installation manual. we don't include how to install these app below Most of this prerequisites is a free app which you can find the "How to" installation tutorial anywhere in web and different machine os have different way to install.
+Make sure to have preinstalled this prerequisites apps before You continue to installation manual. we don't include how to install these apps below most of this prerequisites is a free apps which You can find the "How to" installation tutorial anywhere in web and different machine OS have different way to install.
 - MySql
+- Go
 
 ### Installation manual
 This installation manual will guide You to running the binary on Your ubuntu or mac terminal.
 
 1. Clone the repository
 ```
-git clone https://github.com/62teknologi/62Whale
+git clone https://github.com/62teknologi/62whale
 ```
 
 1. Change directory to the cloned repository
 ```
-cd 62Whale
+cd 62whale
+```
+
+1. Initiate the submodule
+```
+git submodule update --init
 ```
 
 1. Create .env base on .env.example
@@ -64,19 +70,24 @@ cd 62Whale
 cp .env.example .env
 ```
 
-1. change DB variable on .env using Your mysql configuration or the staging database on cloud server eg
+1. Change DB variable on .env using Your mysql configuration or the staging database on cloud server eg
 ```
 HTTP_SERVER_ADDRESS=0.0.0.0:10081
 DB_DRIVER=mysql
 DB_SOURCE_1=root@tcp(127.0.0.1:3306)/whale_local
 ```
 
-1. Run the server
+1. Build the binary
 ```
-./62whale
+go build main.go
 ```
 
-The API server will start running at `http://localhost:10081`. You can now interact with the API using your preferred API client or through the command line with `curl`.
+1. Run the server
+```
+./main
+```
+
+The API server will start running on `http://localhost:10081`. You can now interact with the API using Your preferred API client or through the command line with `curl`.
 
 ## API Endpoints
 
@@ -100,7 +111,8 @@ GET /api/v1/catalog/:name
 | page | 1 | return response in pagination format, eg: ```page=1``` will return first page of the response    |
 | per_page | 30 | set how many data per pagination response |
 | search | null | filter response by string |
-| :field | null | filter specific column you want, eg: if your catalog have ```user_id``` field then you can add ```user_id=1``` to params for searching all catalog where user_id is 1. it support multi value by sending ```user_id[]``` instead ```user_id``` |
+| order | 1 | order data by one or multiple field, eg: ```order=name+asc``` or ```order[]=name+asc&order[]=created_at+desc```    |
+| :field | null | filter specific column You want, eg: if Your catalog have ```user_id``` field then You can add ```user_id=1``` to params for searching all catalog where user_id is 1. it support multi value by sending ```user_id[]``` instead ```user_id``` |
 
 ### Create Catalog
 
@@ -112,7 +124,7 @@ POST /api/v1/catalog/:name
 #### Parameter
 | Name | Def | Description |
 | - | - | - |
-| :field | null | field you want to insert |
+| :field | null | field You want to insert |
 | groups[] | null | lorem |
 | items[] | null | lorem |
 
@@ -127,7 +139,7 @@ PUT /api/v1/catalog/:name/:id
 #### Parameter
 | Name | Def | Description |
 | - | - | - |
-| :field | null | field you want to insert |
+| :field | null | field You want to insert |
 | groups[] | null | lorem |
 
 ### Delete Catalog
@@ -151,16 +163,25 @@ DEL /api/v1/catalog/:name/:id
 ## Set Associations
 - WIP
 
+## Set Filterable
+- WIP
+
+## Set Summary
+- WIP
+
+## Set Operation
+- WIP
+
 # Contributing
 
-If you'd like to contribute to the development of the Whale REST API, please follow these steps:
+If You'd like to contribute to the development of the 62whale REST API, please follow these steps:
 
 1. Fork the repository
-2. Create a new branch for your feature or bugfix
-3. Commit your changes to the branch
-4. Create a pull request, describing the changes you've made
+2. Create a new branch for Your feature or bugfix
+3. Commit Your changes to the branch
+4. Create a pull request, describing the changes You've made
 
-We appreciate your contributions and will review your pull request as soon as possible.
+We appreciate Your contributions and will review Your pull request as soon as possible.
 
 ## Must Preserve Characteristic 
 - Reduce repetition
