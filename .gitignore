@@ -1,4 +1,4 @@
-app.env
+.env
 .DS_Store
 main
 *.log

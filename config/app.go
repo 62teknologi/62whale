@@ -19,8 +19,7 @@ var Data Config
 // LoadConfig reads configuration from file or environment variables.
 func LoadConfig(path string, data *Config) (config Config, err error) {
 	viper.AddConfigPath(path)
-	viper.SetConfigName("app")
-	viper.SetConfigType("env")
+	viper.SetConfigFile(".env")
 
 	viper.SetDefault("HTTP_SERVER_ADDRESS", "0.0.0.0:10081")
 	viper.SetDefault("DB_DRIVER", "mysql")
