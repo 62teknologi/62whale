@@ -39,8 +39,14 @@ func (ctrl *CatalogController) Find(ctx *gin.Context) {
 
 	utils.SetBelongsTo(query, transformer, &columns)
 	delete(transformer, "filterable")
+	field := "id"
+	id := ctx.Param("id")
+	if id == "" {
+		id = ctx.Param("slug")
+		field = "slug"
+	}
 
-	if err := query.Select(columns).Where(ctrl.PluralName+".id = ?", ctx.Param("id")).Take(&value).Error; err != nil {
+	if err := query.Select(columns).Where(ctrl.PluralName+"."+field+" = ?", id).Take(&value).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.SingularLabel+" not found", nil))
 		return
 	}
