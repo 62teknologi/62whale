@@ -3,6 +3,7 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/62teknologi/62whale/62golib/utils"
 	"github.com/62teknologi/62whale/config"
@@ -34,7 +35,7 @@ func (ctrl *CommentController) Find(ctx *gin.Context) {
 	value := map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
 	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
-	query := utils.DB.Table(ctrl.Table)
+	query := utils.DB.Table(ctrl.Table).Where(ctrl.Table + ".deleted_at IS NULL")
 
 	utils.SetBelongsTo(query, transformer, &columns)
 	delete(transformer, "filterable")
@@ -61,7 +62,7 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 	values := []map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
 	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
-	query := utils.DB.Table(ctrl.Table)
+	query := utils.DB.Table(ctrl.Table).Where(ctrl.Table + ".deleted_at IS NULL")
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	search := utils.SetGlobalSearch(query, transformer, ctx)
 
@@ -142,7 +143,7 @@ func (ctrl *CommentController) Update(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
+	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Where("deleted_at IS NULL").Updates(&transformer).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
@@ -154,7 +155,7 @@ func (ctrl *CommentController) Update(ctx *gin.Context) {
 func (ctrl *CommentController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
+	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Updates(map[string]any{"deleted_at": time.Now()}).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}

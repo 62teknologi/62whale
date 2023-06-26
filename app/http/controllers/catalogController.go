@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/62teknologi/62whale/62golib/utils"
 	"github.com/62teknologi/62whale/config"
@@ -35,7 +36,7 @@ func (ctrl *CatalogController) Find(ctx *gin.Context) {
 	value := map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
 	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
-	query := utils.DB.Table(ctrl.PluralName)
+	query := utils.DB.Table(ctrl.PluralName).Where(ctrl.PluralName + ".deleted_at IS NULL")
 
 	utils.SetBelongsTo(query, transformer, &columns)
 	delete(transformer, "filterable")
@@ -58,7 +59,7 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 	values := []map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
 	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
-	query := utils.DB.Table(ctrl.Table)
+	query := utils.DB.Table(ctrl.Table).Where(ctrl.Table + ".deleted_at IS NULL")
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	search := utils.SetGlobalSearch(query, transformer, ctx)
 
@@ -175,7 +176,7 @@ func (ctrl *CatalogController) Update(ctx *gin.Context) {
 	delete(transformer, "groups")
 
 	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
+		if err := tx.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Where("deleted_at IS NULL").Updates(&transformer).Error; err != nil {
 			return err
 		}
 
@@ -215,7 +216,7 @@ func (ctrl *CatalogController) Update(ctx *gin.Context) {
 func (ctrl *CatalogController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	if err := utils.DB.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
+	if err := utils.DB.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Updates(map[string]any{"deleted_at": time.Now()}).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
