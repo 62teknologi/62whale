@@ -34,7 +34,13 @@ func (ctrl *CatalogController) Find(ctx *gin.Context) {
 
 	value := map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
+
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	query := utils.DB.Table(ctrl.PluralName)
 
 	utils.SetBelongsTo(query, transformer, &columns)
@@ -63,7 +69,13 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
+
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	search := utils.SetGlobalSearch(query, transformer, ctx)
@@ -77,7 +89,7 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 	pagination := utils.SetPagination(query, ctx)
 
 	if err := query.Select(columns).Find(&values).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", ctrl.PluralLabel+" not found", nil))
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
 
@@ -92,11 +104,16 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 func (ctrl *CatalogController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/create.json")
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/create.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
-		ctx.JSON(http.StatusOK, utils.ResponseData("failed", "validation", validation.Errors))
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", "validation", validation.Errors))
 		return
 	}
 
@@ -157,11 +174,16 @@ func (ctrl *CatalogController) Create(ctx *gin.Context) {
 func (ctrl *CatalogController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/update.json")
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/update.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
-		ctx.JSON(http.StatusOK, utils.ResponseData("failed", "validation", validation.Errors))
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", "validation", validation.Errors))
 		return
 	}
 

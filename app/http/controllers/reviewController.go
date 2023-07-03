@@ -33,7 +33,12 @@ func (ctrl *ReviewController) Find(ctx *gin.Context) {
 	value := map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
 	order := "id desc"
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	query := utils.DB.Table(ctrl.Table)
 
 	utils.SetBelongsTo(query, transformer, &columns)
@@ -55,7 +60,12 @@ func (ctrl *ReviewController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	search := utils.SetGlobalSearch(query, transformer, ctx)
@@ -82,11 +92,16 @@ func (ctrl *ReviewController) FindAll(ctx *gin.Context) {
 func (ctrl *ReviewController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/create.json")
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/create.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
-		ctx.JSON(http.StatusOK, utils.ResponseData("failed", "validation", validation.Errors))
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", "validation", validation.Errors))
 		return
 	}
 
@@ -111,11 +126,16 @@ func (ctrl *ReviewController) Create(ctx *gin.Context) {
 func (ctrl *ReviewController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/update.json")
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/update.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
-		ctx.JSON(http.StatusOK, utils.ResponseData("failed", "validation", validation.Errors))
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", "validation", validation.Errors))
 		return
 	}
 

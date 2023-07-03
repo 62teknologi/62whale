@@ -34,7 +34,13 @@ func (ctrl *CategoryController) Find(ctx *gin.Context) {
 
 	value := map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	query := utils.DB.Table(ctrl.Table)
 
 	utils.SetOrderByQuery(query, ctx)
@@ -64,7 +70,13 @@ func (ctrl *CategoryController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.Table + ".*"}
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	query := utils.DB.Table(ctrl.Table)
 	filter := utils.SetFilterByQuery(query, transformer, ctx)
 	search := utils.SetGlobalSearch(query, transformer, ctx)
@@ -101,11 +113,16 @@ func (ctrl *CategoryController) FindAll(ctx *gin.Context) {
 func (ctrl *CategoryController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/create.json")
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/create.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
-		ctx.JSON(http.StatusOK, utils.ResponseData("failed", "validation", validation.Errors))
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", "validation", validation.Errors))
 		return
 	}
 
@@ -130,11 +147,16 @@ func (ctrl *CategoryController) Create(ctx *gin.Context) {
 func (ctrl *CategoryController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/update.json")
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/update.json")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
 	input := utils.ParseForm(ctx)
 
 	if validation, err := utils.Validate(input, transformer); err {
-		ctx.JSON(http.StatusOK, utils.ResponseData("failed", "validation", validation.Errors))
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", "validation", validation.Errors))
 		return
 	}
 
@@ -178,7 +200,11 @@ func (ctrl *CategoryController) FetchChild(id int32, sequence []string, total *i
 		return values
 	}
 
-	transformer, _ := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.Table + "/find.json")
+	if err != nil {
+		panic(err.Error())
+	}
+
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
 
 	for _, value := range customResponses {
