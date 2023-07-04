@@ -5,3 +5,5 @@ main
 .idea
 /tmp
 62whale
+run.sh
+nohup.out
