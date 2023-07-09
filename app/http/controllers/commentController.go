@@ -28,7 +28,7 @@ func (ctrl *CommentController) Init(ctx *gin.Context) {
 	ctrl.Table = ctrl.SingularName + "_comments"
 }
 
-func (ctrl *CommentController) Find(ctx *gin.Context) {
+func (ctrl CommentController) Find(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	value := map[string]any{}
@@ -60,7 +60,7 @@ func (ctrl *CommentController) Find(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *CommentController) FindAll(ctx *gin.Context) {
+func (ctrl CommentController) FindAll(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	values := []map[string]any{}
@@ -103,7 +103,7 @@ func (ctrl *CommentController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter, search, summary))
 }
 
-func (ctrl *CommentController) Create(ctx *gin.Context) {
+func (ctrl CommentController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/create.json")
@@ -137,7 +137,7 @@ func (ctrl *CommentController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *CommentController) Update(ctx *gin.Context) {
+func (ctrl CommentController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/update.json")
@@ -171,7 +171,7 @@ func (ctrl *CommentController) Update(ctx *gin.Context) {
 }
 
 // todo : need to check constraint error
-func (ctrl *CommentController) Delete(ctx *gin.Context) {
+func (ctrl CommentController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
@@ -183,7 +183,7 @@ func (ctrl *CommentController) Delete(ctx *gin.Context) {
 }
 
 // todo : this will generate N queries of N row. need cached mechanism to prevent that.
-func (ctrl *CommentController) FetchChild(id int32, sequence []string, total *int32) []map[string]any {
+func (ctrl CommentController) FetchChild(id int32, sequence []string, total *int32) []map[string]any {
 	*total = *total + 1
 	var values []map[string]any
 

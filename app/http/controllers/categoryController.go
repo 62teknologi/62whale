@@ -29,7 +29,7 @@ func (ctrl *CategoryController) Init(ctx *gin.Context) {
 	ctrl.Table = ctrl.SingularName + "_categories"
 }
 
-func (ctrl *CategoryController) Find(ctx *gin.Context) {
+func (ctrl CategoryController) Find(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	value := map[string]any{}
@@ -65,7 +65,7 @@ func (ctrl *CategoryController) Find(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *CategoryController) FindAll(ctx *gin.Context) {
+func (ctrl CategoryController) FindAll(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	values := []map[string]any{}
@@ -110,7 +110,7 @@ func (ctrl *CategoryController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter, search, summary))
 }
 
-func (ctrl *CategoryController) Create(ctx *gin.Context) {
+func (ctrl CategoryController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/create.json")
@@ -144,7 +144,7 @@ func (ctrl *CategoryController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *CategoryController) Update(ctx *gin.Context) {
+func (ctrl CategoryController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/update.json")
@@ -178,7 +178,7 @@ func (ctrl *CategoryController) Update(ctx *gin.Context) {
 }
 
 // todo : need to check constraint error
-func (ctrl *CategoryController) Delete(ctx *gin.Context) {
+func (ctrl CategoryController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
@@ -190,7 +190,7 @@ func (ctrl *CategoryController) Delete(ctx *gin.Context) {
 }
 
 // todo : this will generate N queries of N row. need cached mechanism to prevent that.
-func (ctrl *CategoryController) FetchChild(id int32, sequence []string, total *int32) []map[string]any {
+func (ctrl CategoryController) FetchChild(id int32, sequence []string, total *int32) []map[string]any {
 	*total = *total + 1
 	var values []map[string]any
 

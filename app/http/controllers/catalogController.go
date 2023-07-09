@@ -29,7 +29,7 @@ func (ctrl *CatalogController) Init(ctx *gin.Context) {
 	ctrl.Table = ctrl.PluralName
 }
 
-func (ctrl *CatalogController) Find(ctx *gin.Context) {
+func (ctrl CatalogController) Find(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	value := map[string]any{}
@@ -64,7 +64,7 @@ func (ctrl *CatalogController) Find(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
+func (ctrl CatalogController) FindAll(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	values := []map[string]any{}
@@ -101,7 +101,7 @@ func (ctrl *CatalogController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter, search, summary))
 }
 
-func (ctrl *CatalogController) Create(ctx *gin.Context) {
+func (ctrl CatalogController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/create.json")
@@ -171,7 +171,7 @@ func (ctrl *CatalogController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *CatalogController) Update(ctx *gin.Context) {
+func (ctrl CatalogController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/update.json")
@@ -240,7 +240,7 @@ func (ctrl *CatalogController) Update(ctx *gin.Context) {
 }
 
 // todo : need to check constraint error
-func (ctrl *CatalogController) Delete(ctx *gin.Context) {
+func (ctrl CatalogController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	if err := utils.DB.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {

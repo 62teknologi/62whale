@@ -30,12 +30,12 @@ func main() {
 
 	apiV1 := r.Group("/api/v1").Use(middlewares.DbSelectorMiddleware())
 	{
-		RegisterRoute(apiV1, "comment", &controllers.CommentController{})
-		RegisterRoute(apiV1, "category", &controllers.CategoryController{})
-		RegisterRoute(apiV1, "catalog", &controllers.CatalogController{})
-		RegisterRoute(apiV1, "group", &controllers.GroupController{})
-		RegisterRoute(apiV1, "item", &controllers.ItemController{})
-		RegisterRoute(apiV1, "review", &controllers.ReviewController{})
+		RegisterRoute(apiV1, "comment", controllers.CommentController{})
+		RegisterRoute(apiV1, "category", controllers.CategoryController{})
+		RegisterRoute(apiV1, "catalog", controllers.CatalogController{})
+		RegisterRoute(apiV1, "group", controllers.GroupController{})
+		RegisterRoute(apiV1, "item", controllers.ItemController{})
+		RegisterRoute(apiV1, "review", controllers.ReviewController{})
 	}
 
 	r.GET("/health", func(c *gin.Context) {

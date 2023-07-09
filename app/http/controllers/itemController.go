@@ -27,7 +27,7 @@ func (ctrl *ItemController) Init(ctx *gin.Context) {
 	ctrl.Table = ctrl.SingularName + "_items"
 }
 
-func (ctrl *ItemController) Find(ctx *gin.Context) {
+func (ctrl ItemController) Find(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	value := map[string]any{}
@@ -56,7 +56,7 @@ func (ctrl *ItemController) Find(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *ItemController) FindAll(ctx *gin.Context) {
+func (ctrl ItemController) FindAll(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	values := []map[string]any{}
@@ -91,7 +91,7 @@ func (ctrl *ItemController) FindAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter, search, summary))
 }
 
-func (ctrl *ItemController) Create(ctx *gin.Context) {
+func (ctrl ItemController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/create.json")
@@ -125,7 +125,7 @@ func (ctrl *ItemController) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+ctrl.SingularLabel+" success", transformer))
 }
 
-func (ctrl *ItemController) Update(ctx *gin.Context) {
+func (ctrl ItemController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.Table + "/update.json")
@@ -159,7 +159,7 @@ func (ctrl *ItemController) Update(ctx *gin.Context) {
 }
 
 // todo : need to check constraint error
-func (ctrl *ItemController) Delete(ctx *gin.Context) {
+func (ctrl ItemController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	if err := utils.DB.Table(ctrl.Table).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
