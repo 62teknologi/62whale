@@ -1,10 +1,9 @@
 package controllers
 
 import (
-	"net/http"
-
 	"github.com/62teknologi/62whale/62golib/utils"
 	"github.com/62teknologi/62whale/config"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -127,40 +126,78 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	item, item_exist := input["items"]
-	group, groups_exist := input["groups"]
+	hasMany := transformer["has_many"]
+	delete(transformer, "has_many")
 
-	delete(transformer, "items")
+	// TODO do not hardcode this
 	delete(transformer, "groups")
 
-	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
-		if err := tx.Table(ctrl.PluralName).Create(&transformer).Error; err != nil {
+	_, duplicateExist := transformer["duplicate"]
+
+	if err = utils.DB.Transaction(func(tx *gorm.DB) error {
+		if duplicateExist {
+			for i := range hasMany.(map[string]any) {
+				transformerValues := transformer[i]
+				defaultItem := utils.FilterMap(transformerValues, func(item map[string]any) bool {
+					_, itemDefaultExist := item["default"]
+					if itemDefaultExist {
+						isDefaultItem := item["default"].(bool)
+						return isDefaultItem == true
+					}
+					return false
+				})
+
+				if len(defaultItem) != 0 {
+					utils.SetDoubleRecord(transformer, defaultItem[0], i)
+				} else {
+					utils.SetDoubleRecord(transformer, transformerValues.([]any)[0].(map[string]any), i)
+				}
+				delete(transformer, "duplicate")
+			}
+		}
+
+		hasManyItems := make(map[string]any)
+		if hasMany != nil {
+			for i := range hasMany.(map[string]any) {
+				hasManyItems[i] = transformer[i]
+				delete(transformer, i)
+			}
+		}
+
+		if err = tx.Table(ctrl.PluralName).Create(&transformer).Error; err != nil {
 			return err
 		}
 
-		if item_exist || groups_exist {
-			tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
+		if hasMany != nil {
+			for i, v := range hasMany.(map[string]any) {
+				table := v.(map[string]any)["table"].(string)
+				fk := v.(map[string]any)["fk"].(string)
 
-			if item_exist {
-				items := utils.Prepare1toM(ctrl.SingularName+"_id", transformer["id"], item)
+				tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
 
-				if err := tx.Table(ctrl.SingularName + "_items").Create(&items).Error; err != nil {
+				items := utils.Prepare1toM(fk, transformer["id"], hasManyItems[i])
+
+				if err = tx.Table(table).Create(&items).Error; err != nil {
 					return err
 				}
 
-				transformer["items"] = items
-			}
-
-			if groups_exist {
-				groups := utils.PrepareMtoM(ctrl.SingularName+"_id", transformer["id"], ctrl.SingularName+"_group_id", group)
-
-				if err := tx.Table(ctrl.PluralName + "_groups").Create(&groups).Error; err != nil {
-					return err
-				}
-
-				transformer["groups"] = groups
+				transformer[i] = items
 			}
 		}
+
+		//	// TODO do not hardcode this
+		//if groupsExist {
+		//	tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
+		//	if groupsExist {
+		//		groups := utils.PrepareMtoM(ctrl.SingularName+"_id", transformer["id"], ctrl.SingularName+"_group_id", group)
+		//
+		//		if err := tx.Table(ctrl.PluralName + "_groups").Create(&groups).Error; err != nil {
+		//			return err
+		//		}
+		//
+		//		transformer["groups"] = groups
+		//	}
+		//}
 
 		return nil
 	}); err != nil {
