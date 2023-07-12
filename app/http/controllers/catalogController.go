@@ -129,8 +129,8 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 	hasMany := transformer["has_many"]
 	delete(transformer, "has_many")
 
-	// TODO do not hardcode this
-	delete(transformer, "groups")
+	manyToMany := transformer["many_to_many"]
+	delete(transformer, "many_to_many")
 
 	_, duplicateExist := transformer["duplicate"]
 
@@ -164,6 +164,14 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 			}
 		}
 
+		hasManyToManyGroups := make(map[string]any)
+		if hasManyToManyGroups != nil {
+			for i := range manyToMany.(map[string]any) {
+				hasManyToManyGroups[i] = transformer[i]
+				delete(transformer, i)
+			}
+		}
+
 		if err = tx.Table(ctrl.PluralName).Create(&transformer).Error; err != nil {
 			return err
 		}
@@ -185,19 +193,22 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 			}
 		}
 
-		//	// TODO do not hardcode this
-		//if groupsExist {
-		//	tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
-		//	if groupsExist {
-		//		groups := utils.PrepareMtoM(ctrl.SingularName+"_id", transformer["id"], ctrl.SingularName+"_group_id", group)
-		//
-		//		if err := tx.Table(ctrl.PluralName + "_groups").Create(&groups).Error; err != nil {
-		//			return err
-		//		}
-		//
-		//		transformer["groups"] = groups
-		//	}
-		//}
+		if manyToMany != nil {
+			for i, v := range manyToMany.(map[string]any) {
+				table := v.(map[string]any)["table"].(string)
+				fk1 := v.(map[string]any)["fk_1"].(string)
+				fk2 := v.(map[string]any)["fk_2"].(string)
+
+				tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
+				groups := utils.PrepareMtoM(fk1, transformer["id"], fk2, hasManyToManyGroups[i])
+
+				if err = tx.Table(table).Create(&groups).Error; err != nil {
+					return err
+				}
+
+				transformer[i] = groups
+			}
+		}
 
 		return nil
 	}); err != nil {
@@ -234,7 +245,7 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 	utils.MapNullValuesRemover(transformer)
 
 	item, item_exist := transformer["items"]
-	group, groups_exist := transformer["groups"]
+	group, groups_exist := transformer["categories"]
 
 	delete(transformer, "items")
 	delete(transformer, "groups")
