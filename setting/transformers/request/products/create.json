@@ -1,9 +1,8 @@
 {
     "name":"required|min:3|max:255",
-    "slug":"",
     "user_id":"required|number",
     "product_category_id":"required|number",
-    "brand_id":"number",
+    "brand_id":"number|required",
     "description":"",
     "length":"number",
     "width":"number",
@@ -32,8 +31,7 @@
     "has_many": {
         "items": {
             "table": "product_items",
-            "fk": "product_id",
-            "columns": ["id", "name"]
+            "fk": "product_id"
         }
     },
     "duplicate": {

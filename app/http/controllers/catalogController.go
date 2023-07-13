@@ -3,13 +3,13 @@ package controllers
 import (
 	"github.com/62teknologi/62whale/62golib/utils"
 	"github.com/62teknologi/62whale/config"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gosimple/slug"
-
 	"gorm.io/gorm"
+	"net/http"
+	"reflect"
+	"strings"
 )
 
 type CatalogController struct {
@@ -111,6 +111,16 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 
 	input := utils.ParseForm(ctx)
 
+	for key := range transformer {
+		_, ok := input[key]
+
+		if reflect.TypeOf(transformer[key]).Kind() != reflect.Map && reflect.TypeOf(transformer[key]).Kind() != reflect.Slice {
+			if !ok && !strings.Contains(transformer[key].(string), "required") {
+				delete(transformer, key)
+			}
+		}
+	}
+
 	if validation, err := utils.Validate(input, transformer); err {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", "validation", validation.Errors))
 		return
@@ -125,6 +135,8 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
+
+	transformer["slug"] = ""
 
 	hasMany := transformer["has_many"]
 	delete(transformer, "has_many")
