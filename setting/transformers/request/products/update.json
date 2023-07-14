@@ -27,5 +27,24 @@
         "custom_1":"",
         "status_id":"number"
     }],
-    "groups":[""]
+    "has_many": {
+        "items": {
+            "table": "product_items",
+            "fk": "product_id",
+            "columns": ["id", "name"]
+        }
+    },
+    "duplicate": {
+        "items": {
+            "columns":["name"]
+        }
+    },
+    "categories":[""],
+    "many_to_many": {
+        "categories": {
+            "table":"product_categories",
+            "fk_1": "product_id",
+            "fk_2": "category_id"
+        }
+    }
 }

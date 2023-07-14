@@ -256,37 +256,92 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	item, item_exist := transformer["items"]
-	group, groups_exist := transformer["categories"]
+	hasMany := transformer["has_many"]
+	delete(transformer, "has_many")
 
-	delete(transformer, "items")
-	delete(transformer, "groups")
+	manyToMany := transformer["many_to_many"]
+	delete(transformer, "many_to_many")
+
+	_, duplicateExist := transformer["duplicate"]
 
 	if err := utils.DB.Transaction(func(tx *gorm.DB) error {
+		if duplicateExist {
+			for i := range hasMany.(map[string]any) {
+				transformerValues := transformer[i]
+				defaultItem := utils.FilterMap(transformerValues, func(item map[string]any) bool {
+					_, itemDefaultExist := item["default"]
+					if itemDefaultExist {
+						isDefaultItem := item["default"].(bool)
+						return isDefaultItem == true
+					}
+					return false
+				})
+
+				if len(defaultItem) != 0 {
+					utils.SetDoubleRecord(transformer, defaultItem[0], i)
+				} else {
+					utils.SetDoubleRecord(transformer, transformerValues.([]any)[0].(map[string]any), i)
+				}
+				delete(transformer, "duplicate")
+			}
+		}
+
+		hasManyItems := make(map[string]any)
+		if hasMany != nil {
+			for i := range hasMany.(map[string]any) {
+				hasManyItems[i] = transformer[i]
+				delete(transformer, i)
+			}
+		}
+
+		hasManyToManyGroups := make(map[string]any)
+		if hasManyToManyGroups != nil {
+			for i := range manyToMany.(map[string]any) {
+				hasManyToManyGroups[i] = transformer[i]
+				delete(transformer, i)
+			}
+		}
+
 		if err := tx.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Updates(&transformer).Error; err != nil {
 			return err
 		}
 
-		if item_exist || groups_exist {
-			if item_exist {
-				items := utils.Prepare1toM(ctrl.SingularName+"_id", ctx.Param("id"), item)
+		if hasMany != nil {
+			for i, v := range hasMany.(map[string]any) {
+				table := v.(map[string]any)["table"].(string)
+				fk := v.(map[string]any)["fk"].(string)
 
-				if err := tx.Table(ctrl.SingularName + "_items").Create(&items).Error; err != nil {
+				if err = tx.Table(table).Where(fk+" = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
 					return err
 				}
 
-				transformer["items"] = items
+				items := utils.Prepare1toM(fk, ctx.Param("id"), hasManyItems[i])
+
+				if err = tx.Table(table).Create(&items).Error; err != nil {
+					return err
+				}
+
+				transformer[i] = items
 			}
+		}
 
-			if groups_exist {
-				tx.Table(ctrl.PluralName+"_groups").Where(ctrl.SingularName+"_id = ?", ctx.Param("id")).Delete(map[string]any{})
-				groups := utils.PrepareMtoM(ctrl.SingularName+"_id", ctx.Param("id"), ctrl.SingularName+"_group_id", group)
+		if manyToMany != nil {
+			for i, v := range manyToMany.(map[string]any) {
+				table := v.(map[string]any)["table"].(string)
+				fk1 := v.(map[string]any)["fk_1"].(string)
+				fk2 := v.(map[string]any)["fk_2"].(string)
 
-				if err := tx.Table(ctrl.PluralName + "_groups").Create(&groups).Error; err != nil {
+				if err = tx.Table(table).Where(fk1+" = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
 					return err
 				}
 
-				transformer["groups"] = groups
+				tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
+				groups := utils.PrepareMtoM(fk1, ctx.Param("id"), fk2, hasManyToManyGroups[i])
+
+				if err = tx.Table(table).Create(&groups).Error; err != nil {
+					return err
+				}
+				transformer[i] = groups
 			}
 		}
 
