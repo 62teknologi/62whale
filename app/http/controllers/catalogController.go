@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/62teknologi/62whale/62golib/utils"
 	"github.com/62teknologi/62whale/config"
 	"github.com/gin-gonic/gin"
@@ -8,8 +9,6 @@ import (
 	"github.com/gosimple/slug"
 	"gorm.io/gorm"
 	"net/http"
-	"reflect"
-	"strings"
 )
 
 type CatalogController struct {
@@ -111,16 +110,6 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 
 	input := utils.ParseForm(ctx)
 
-	for key := range transformer {
-		_, ok := input[key]
-
-		if reflect.TypeOf(transformer[key]).Kind() != reflect.Map && reflect.TypeOf(transformer[key]).Kind() != reflect.Slice {
-			if !ok && !strings.Contains(transformer[key].(string), "required") {
-				delete(transformer, key)
-			}
-		}
-	}
-
 	if validation, err := utils.Validate(input, transformer); err {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", "validation", validation.Errors))
 		return
@@ -129,26 +118,16 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 	if input["name"] != nil && transformer["slug"] == "" {
 		name, _ := input["name"].(string)
 		transformer["slug"] = slug.Make(name)
-	} else if transformer["slug"] == "" {
+	} else {
 		transformer["slug"] = uuid.New()
 	}
 
 	utils.MapValuesShifter(transformer, input)
 	utils.MapNullValuesRemover(transformer)
 
-	transformer["slug"] = ""
-
-	hasMany := transformer["has_many"]
-	delete(transformer, "has_many")
-
-	manyToMany := transformer["many_to_many"]
-	delete(transformer, "many_to_many")
-
-	_, duplicateExist := transformer["duplicate"]
-
 	if err = utils.DB.Transaction(func(tx *gorm.DB) error {
-		if duplicateExist {
-			for i := range hasMany.(map[string]any) {
+		if _, ok := transformer["duplicate"]; ok {
+			for i := range transformer["has_many"].(map[string]any) {
 				transformerValues := transformer[i]
 				defaultItem := utils.FilterMap(transformerValues, func(item map[string]any) bool {
 					_, itemDefaultExist := item["default"]
@@ -164,49 +143,72 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 				} else {
 					utils.SetDoubleRecord(transformer, transformerValues.([]any)[0].(map[string]any), i)
 				}
-				delete(transformer, "duplicate")
 			}
 		}
 
 		hasManyItems := make(map[string]any)
-		if hasMany != nil {
-			for i := range hasMany.(map[string]any) {
+		if transformer["has_many"] != nil {
+			for i := range transformer["has_many"].(map[string]any) {
 				hasManyItems[i] = transformer[i]
 				delete(transformer, i)
 			}
 		}
 
 		hasManyToManyGroups := make(map[string]any)
-		if hasManyToManyGroups != nil {
-			for i := range manyToMany.(map[string]any) {
+		if transformer["many_to_many"] != nil {
+			for i := range transformer["many_to_many"].(map[string]any) {
 				hasManyToManyGroups[i] = transformer[i]
 				delete(transformer, i)
 			}
 		}
 
-		if err = tx.Table(ctrl.PluralName).Create(&transformer).Error; err != nil {
+		createdProduct := make(map[string]any)
+		for k, v := range transformer {
+			createdProduct[k] = v
+		}
+		createdProduct = utils.RemoveSliceAndMap(createdProduct)
+
+		if err = tx.Table(ctrl.PluralName).Create(&createdProduct).Error; err != nil {
 			return err
 		}
 
-		if hasMany != nil {
-			for i, v := range hasMany.(map[string]any) {
-				table := v.(map[string]any)["table"].(string)
-				fk := v.(map[string]any)["fk"].(string)
+		utils.ProcessHasMany(transformer, func(key string, data map[string]any, options map[string]any, parentKey string) {
+			var parentData map[string]any
+			var items []map[string]any
+			if options["ft"].(string) == "products" {
+				tx.Table(options["ft"].(string)).Where(createdProduct).Take(&parentData)
 
-				tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
-
-				items := utils.Prepare1toM(fk, transformer["id"], hasManyItems[i])
-
-				if err = tx.Table(table).Create(&items).Error; err != nil {
-					return err
+				items = utils.Prepare1toM(options["fk"].(string), parentData["id"], hasManyItems[key].([]any))
+				for i := range items {
+					items[i] = utils.RemoveSliceAndMap(items[i])
 				}
 
-				transformer[i] = items
-			}
-		}
+				if err = tx.Table(options["table"].(string)).Create(&items).Error; err != nil {
+					panic(fmt.Sprintf("error while create %v: %e", key, err))
+				}
 
-		if manyToMany != nil {
-			for i, v := range manyToMany.(map[string]any) {
+				transformer[key] = items
+			} else {
+				for i, v := range hasManyItems[parentKey].([]any) {
+					if _, ok := v.(map[string]any)[key]; ok {
+						tx.Table(options["ft"].(string)).Where(utils.RemoveSliceAndMap(v.(map[string]any))).Take(&parentData)
+						items = utils.Prepare1toM(options["fk"].(string), parentData["id"], v.(map[string]any)[key])
+						for i := range items {
+							items[i] = utils.RemoveSliceAndMap(items[i])
+						}
+
+						if err = tx.Table(options["table"].(string)).Create(&items).Error; err != nil {
+							panic(fmt.Sprintf("error while create %v: %e", key, err))
+						}
+
+						transformer[parentKey].([]map[string]any)[i][key] = items
+					}
+				}
+			}
+		}, "")
+
+		if transformer["many_to_many"] != nil {
+			for i, v := range transformer["many_to_many"].(map[string]any) {
 				table := v.(map[string]any)["table"].(string)
 				fk1 := v.(map[string]any)["fk_1"].(string)
 				fk2 := v.(map[string]any)["fk_2"].(string)
@@ -227,6 +229,10 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
+
+	delete(transformer, "has_many")
+	delete(transformer, "many_to_many")
+	delete(transformer, "duplicate")
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "create "+ctrl.SingularLabel+" success", transformer))
 }
