@@ -26,7 +26,7 @@
         "color":"",
         "custom_1":"",
         "status_id":"number",
-        "default": "number",
+        "is_default": "number",
         "attributes": [{
             "type": "",
             "value": ""
