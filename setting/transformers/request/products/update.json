@@ -25,7 +25,8 @@
         "size":"number",
         "color":"",
         "custom_1":"",
-        "status_id":"number"
+        "status_id":"number",
+        "default": "number"
     }],
     "has_many": {
         "items": {
