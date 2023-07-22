@@ -57,4 +57,5 @@ func RegisterRoute(r gin.IRoutes, t string, c interfaces.Crud) {
 	r.POST("/"+t+"/:table", c.Create)
 	r.PUT("/"+t+"/:table/:id", c.Update)
 	r.DELETE("/"+t+"/:table/:id", c.Delete)
+	r.DELETE("/"+t+"/:table", c.DeleteByQuery)
 }

@@ -2,13 +2,14 @@ package controllers
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/62teknologi/62whale/62golib/utils"
 	"github.com/62teknologi/62whale/config"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gosimple/slug"
 	"gorm.io/gorm"
-	"net/http"
 )
 
 type CatalogController struct {
@@ -32,19 +33,19 @@ func (ctrl CatalogController) Find(ctx *gin.Context) {
 
 	value := map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
-
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
 
 	query := utils.DB.Table(ctrl.PluralName)
-
-	utils.SetBelongsTo(query, transformer, &columns)
+	utils.SetBelongsTo(query, transformer, &columns, ctx)
 	delete(transformer, "filterable")
 	field := "id"
 	id := ctx.Param("id")
+
 	if id == "" {
 		id = ctx.Param("slug")
 		field = "slug"
@@ -67,8 +68,8 @@ func (ctrl CatalogController) FindAll(ctx *gin.Context) {
 
 	values := []map[string]any{}
 	columns := []string{ctrl.PluralName + ".*"}
-
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/response/" + ctrl.PluralName + "/find.json")
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
@@ -79,7 +80,7 @@ func (ctrl CatalogController) FindAll(ctx *gin.Context) {
 	search := utils.SetGlobalSearch(query, transformer, ctx)
 
 	utils.SetOrderByQuery(query, ctx)
-	utils.SetBelongsTo(query, transformer, &columns)
+	utils.SetBelongsTo(query, transformer, &columns, ctx)
 
 	delete(transformer, "filterable")
 	delete(transformer, "searchable")
@@ -94,7 +95,7 @@ func (ctrl CatalogController) FindAll(ctx *gin.Context) {
 	customResponses := utils.MultiMapValuesShifter(transformer, values)
 	summary := utils.GetSummary(transformer, values)
 
-	utils.MultiAttachHasMany(customResponses)
+	utils.MultiAttachHasMany(customResponses, ctx)
 
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter, search, summary))
 }
@@ -103,6 +104,7 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/create.json")
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
@@ -147,6 +149,7 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 		}
 
 		hasManyItems := make(map[string]any)
+
 		if transformer["has_many"] != nil {
 			for i := range transformer["has_many"].(map[string]any) {
 				hasManyItems[i] = transformer[i]
@@ -155,6 +158,7 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 		}
 
 		hasManyToManyGroups := make(map[string]any)
+
 		if transformer["many_to_many"] != nil {
 			for i := range transformer["many_to_many"].(map[string]any) {
 				hasManyToManyGroups[i] = transformer[i]
@@ -163,9 +167,11 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 		}
 
 		createdProduct := make(map[string]any)
+
 		for k, v := range transformer {
 			createdProduct[k] = v
 		}
+
 		createdProduct = utils.RemoveSliceAndMap(createdProduct)
 
 		if err = tx.Table(ctrl.PluralName).Create(&createdProduct).Error; err != nil {
@@ -241,6 +247,7 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/update.json")
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
 		return
@@ -365,6 +372,27 @@ func (ctrl CatalogController) Delete(ctx *gin.Context) {
 	ctrl.Init(ctx)
 
 	if err := utils.DB.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Delete(map[string]any{}).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, utils.ResponseData("success", "delete "+ctrl.SingularLabel+" success", nil))
+}
+
+func (ctrl CatalogController) DeleteByQuery(ctx *gin.Context) {
+	ctrl.Init(ctx)
+
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/delete.json")
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
+	query := utils.DB.Table(ctrl.PluralName)
+	utils.SetFilterByQuery(query, transformer, ctx)
+
+	if err := query.Delete(map[string]any{}).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}

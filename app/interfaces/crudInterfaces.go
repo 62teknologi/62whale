@@ -8,4 +8,5 @@ type Crud interface {
 	Create(*gin.Context)
 	Update(*gin.Context)
 	Delete(*gin.Context)
+	DeleteByQuery(*gin.Context)
 }

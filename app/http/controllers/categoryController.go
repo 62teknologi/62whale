@@ -44,7 +44,7 @@ func (ctrl CategoryController) Find(ctx *gin.Context) {
 	query := utils.DB.Table(ctrl.Table)
 
 	utils.SetOrderByQuery(query, ctx)
-	utils.SetBelongsTo(query, transformer, &columns)
+	utils.SetBelongsTo(query, transformer, &columns, ctx)
 
 	delete(transformer, "filterable")
 
@@ -82,7 +82,7 @@ func (ctrl CategoryController) FindAll(ctx *gin.Context) {
 	search := utils.SetGlobalSearch(query, transformer, ctx)
 
 	utils.SetOrderByQuery(query, ctx)
-	utils.SetBelongsTo(query, transformer, &columns)
+	utils.SetBelongsTo(query, transformer, &columns, ctx)
 
 	delete(transformer, "filterable")
 	delete(transformer, "searchable")
@@ -213,4 +213,25 @@ func (ctrl CategoryController) FetchChild(id int32, sequence []string, total *in
 	}
 
 	return customResponses
+}
+
+func (ctrl CategoryController) DeleteByQuery(ctx *gin.Context) {
+	ctrl.Init(ctx)
+
+	transformer, err := utils.JsonFileParser(config.Data.SettingPath + "/transformers/request/" + ctrl.PluralName + "/delete.json")
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
+	query := utils.DB.Table(ctrl.PluralName)
+	utils.SetFilterByQuery(query, transformer, ctx)
+
+	if err := query.Delete(map[string]any{}).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, utils.ResponseData("success", "delete "+ctrl.SingularLabel+" success", nil))
 }
