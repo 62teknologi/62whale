@@ -24,6 +24,14 @@
       "columns": ["id", "name"]
     }
   },
+  "many_to_many": {
+    "categories": {
+      "table": "product_categories",
+      "fk1": "product_id",
+      "fk2": "category_id",
+      "columns": ["id", "name"]
+    }
+  },
   "belongs_to": {
     "user": {
       "table": "users",

@@ -59,6 +59,7 @@ func (ctrl CatalogController) Find(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, value)
 	utils.AttachBelongsTo(transformer, value)
 	utils.AttachHasMany(transformer)
+	utils.AttachManyToMany(transformer)
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
