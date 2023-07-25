@@ -182,7 +182,7 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 		utils.ProcessHasMany(transformer, func(key string, data map[string]any, options map[string]any, parentKey string) {
 			var parentData map[string]any
 			var items []map[string]any
-			if options["ft"].(string) == "products" {
+			if options["ft"].(string) == ctrl.PluralName {
 				tx.Table(options["ft"].(string)).Where(createdProduct).Take(&parentData)
 
 				items = utils.Prepare1toM(options["fk"].(string), parentData["id"], hasManyItems[key].([]any))
