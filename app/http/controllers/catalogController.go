@@ -59,6 +59,7 @@ func (ctrl CatalogController) Find(ctx *gin.Context) {
 	utils.MapValuesShifter(transformer, value)
 	utils.AttachBelongsTo(transformer, value)
 	utils.AttachHasMany(transformer)
+	utils.AttachManyToMany(transformer)
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "find "+ctrl.SingularLabel+" success", transformer))
 }
@@ -96,6 +97,7 @@ func (ctrl CatalogController) FindAll(ctx *gin.Context) {
 	summary := utils.GetSummary(transformer, values)
 
 	utils.MultiAttachHasMany(customResponses, ctx)
+	utils.MultiAttachManyToMany(customResponses, ctx)
 
 	ctx.JSON(http.StatusOK, utils.ResponseDataPaginate("success", "find "+ctrl.PluralLabel+" success", customResponses, pagination, filter, search, summary))
 }
