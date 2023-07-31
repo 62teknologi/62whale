@@ -2,14 +2,15 @@ package controllers
 
 import (
 	"fmt"
-	"net/http"
-
 	"github.com/62teknologi/62whale/62golib/utils"
 	"github.com/62teknologi/62whale/config"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gosimple/slug"
 	"gorm.io/gorm"
+	"net/http"
+	"strconv"
+	"time"
 )
 
 type CatalogController struct {
@@ -119,15 +120,16 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 		return
 	}
 
-	if input["name"] != nil && transformer["slug"] == "" {
+	utils.MapValuesShifter(transformer, input)
+	utils.MapNullValuesRemover(transformer)
+
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	if input["name"] != nil {
 		name, _ := input["name"].(string)
-		transformer["slug"] = slug.Make(name)
+		transformer["slug"] = slug.Make(name) + timestamp[8:]
 	} else {
 		transformer["slug"] = uuid.New()
 	}
-
-	utils.MapValuesShifter(transformer, input)
-	utils.MapNullValuesRemover(transformer)
 
 	if err = utils.DB.Transaction(func(tx *gorm.DB) error {
 		if _, ok := transformer["duplicate"]; ok {
@@ -217,12 +219,15 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 
 		if transformer["many_to_many"] != nil {
 			for i, v := range transformer["many_to_many"].(map[string]any) {
+				var parentData map[string]any
+				tx.Table(ctrl.PluralName).Where(createdProduct).Take(&parentData)
+
 				table := v.(map[string]any)["table"].(string)
 				fk1 := v.(map[string]any)["fk_1"].(string)
 				fk2 := v.(map[string]any)["fk_2"].(string)
 
 				tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
-				groups := utils.PrepareMtoM(fk1, transformer["id"], fk2, hasManyToManyGroups[i])
+				groups := utils.PrepareMtoM(fk1, parentData["id"], fk2, hasManyToManyGroups[i])
 
 				if err = tx.Table(table).Create(&groups).Error; err != nil {
 					return err
