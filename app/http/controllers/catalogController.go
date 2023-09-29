@@ -180,7 +180,12 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 			return err
 		}
 
+		var processHasManyError error
 		utils.ProcessHasMany(transformer, func(key string, data map[string]any, options map[string]any, parentKey string) {
+			if processHasManyError != nil {
+				return
+			}
+
 			var parentData map[string]any
 			var items []map[string]any
 			if options["ft"].(string) == ctrl.PluralName {
@@ -192,21 +197,26 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 				}
 
 				if err = tx.Table(options["table"].(string)).Create(&items).Error; err != nil {
-					panic(fmt.Sprintf("error while create %v: %e", key, err))
+					processHasManyError = fmt.Errorf("error while create %v: %e", key, err.Error())
+					return
 				}
 
 				transformer[key] = items
 			} else {
 				for i, v := range hasManyItems[parentKey].([]any) {
 					if _, ok := v.(map[string]any)[key]; ok {
-						tx.Table(options["ft"].(string)).Where(utils.RemoveSliceAndMap(v.(map[string]any))).Take(&parentData)
+						if err = tx.Table(options["ft"].(string)).Where(utils.RemoveSliceAndMap(v.(map[string]any))).Take(&parentData).Error; err != nil {
+							processHasManyError = fmt.Errorf("error while create %v: %e", key, err.Error())
+							return
+						}
 						items = utils.Prepare1toM(options["fk"].(string), parentData["id"], v.(map[string]any)[key])
 						for i := range items {
 							items[i] = utils.RemoveSliceAndMap(items[i])
 						}
 
 						if err = tx.Table(options["table"].(string)).Create(&items).Error; err != nil {
-							panic(fmt.Sprintf("error while create %v: %e", key, err))
+							processHasManyError = fmt.Errorf("error while create %v: %e", key, err.Error())
+							return
 						}
 
 						transformer[parentKey].([]map[string]any)[i][key] = items
@@ -214,6 +224,10 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 				}
 			}
 		}, "")
+
+		if processHasManyError != nil {
+			return processHasManyError
+		}
 
 		if transformer["many_to_many"] != nil {
 			for i, v := range transformer["many_to_many"].(map[string]any) {
@@ -323,6 +337,10 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 
 		if hasMany != nil {
 			for i, v := range hasMany.(map[string]any) {
+				if transformer[i] == nil {
+					continue
+				}
+
 				table := v.(map[string]any)["table"].(string)
 				fk := v.(map[string]any)["fk"].(string)
 
@@ -342,6 +360,9 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 
 		if manyToMany != nil {
 			for i, v := range manyToMany.(map[string]any) {
+				if transformer[i] == nil {
+					continue
+				}
 				table := v.(map[string]any)["table"].(string)
 				fk1 := v.(map[string]any)["fk_1"].(string)
 				fk2 := v.(map[string]any)["fk_2"].(string)
@@ -350,7 +371,10 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 					return err
 				}
 
-				tx.Table(ctrl.PluralName).Where("slug = ?", transformer["slug"]).Take(&transformer)
+				if err = tx.Table(ctrl.PluralName).Where("id = ?", ctx.Param("id")).Take(&transformer).Error; err != nil {
+					return err
+				}
+
 				groups := utils.PrepareMtoM(fk1, ctx.Param("id"), fk2, hasManyToManyGroups[i])
 
 				if err = tx.Table(table).Create(&groups).Error; err != nil {
@@ -365,6 +389,8 @@ func (ctrl CatalogController) Update(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, utils.ResponseData("error", err.Error(), nil))
 		return
 	}
+
+	ctrl.Find(ctx)
 
 	ctx.JSON(http.StatusOK, utils.ResponseData("success", "update "+ctrl.SingularLabel+" success", transformer))
 }
