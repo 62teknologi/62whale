@@ -126,7 +126,7 @@ func (ctrl CatalogController) Create(ctx *gin.Context) {
 	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
 	if input["name"] != nil {
 		name, _ := input["name"].(string)
-		transformer["slug"] = slug.Make(name) + timestamp[8:]
+		transformer["slug"] = slug.Make(name) + "-" + timestamp
 	} else {
 		transformer["slug"] = uuid.New()
 	}
